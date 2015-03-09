@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>JUnitFormatter</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="css/elixir.css" type="text/css" media="screen" charset="utf-8" />
+    <script type="text/javascript" charset="utf-8">
+      relpath = '';
+      if (relpath != '') relpath += '/';
+    </script>
+
+    <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+    <script type="text/javascript" charset="utf-8" src="js/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </head>
+
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+
+    <section id="content">
+      <div class="breadcrumbs">JUnit Formatter v0.0.1 &rarr; <a href="overview.html">Overview</a> &rarr; <a href="JUnitFormatter.html">JUnitFormatter</a></div>
+      <h1>
+        JUnitFormatter
+        
+      </h1>
+
+      <ul class="summary_links">
+        
+          <li><a href="#summary">Summary</a></li>
+        
+        
+        
+        
+          <li><a href="#macros_details">Macros</a></li>
+        
+        
+      </ul>
+
+      
+        <section id="moduledoc" class="docstring">
+          <ul>
+<li>A ExUnit.Formatter implementation that generates a xml in the format understood by JUnit.
+</li>
+</ul>
+<p>To acomplish this, there are some mappings that are not straight one to one. 
+Therefore, here goes the mapping:</p>
+<ul>
+<li>JUnit - ExUnit
+</li>
+<li>Testsuites - :testsuite
+</li>
+<li>Testsuite - %ExUnit.TestCase{}
+</li>
+<li>failures = failures
+</li>
+<li>skipped = skip
+</li>
+<li>errors = invalid
+</li>
+<li>time = (sum of all times)
+</li>
+<li>Testcase - %ExUnit.Test
+</li>
+<li>name = :case
+</li>
+<li>test = :test
+</li>
+<li><p>content (only if not successful)</p>
+<ul>
+<li>skipped = {:state, {:skip, _}}
+</li>
+<li>failed = {:state, {:failed, {_, reason, stacktrace}}}
+</li>
+<li>reason = reason.message
+</li>
+<li>contet = Exception.format_stacktrace(stacktrace)
+</li>
+<li>error = {:invalid, module}
+</li>
+</ul>
+</li>
+</ul>
+<p>Currently it writes the results in an xml file in the project’s build_path.</p>
+
+        </section>
+      
+
+      
+        <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L1" class="view_source">Source</a>
+      
+
+      
+        <h2 id="summary">Summary<span class="detail_header_links"><a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a></span></h2>
+        <table class="summary">
+          <tr>
+  <td class="summary_signature"><a href="#xmlAttribute/1">xmlAttribute(args \\ [])</a></td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#xmlAttribute/2">xmlAttribute(record, args)</a></td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#xmlElement/1">xmlElement(args \\ [])</a></td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#xmlElement/2">xmlElement(record, args)</a></td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#xmlText/1">xmlText(args \\ [])</a></td>
+  
+</tr>
+<tr>
+  <td class="summary_signature"><a href="#xmlText/2">xmlText(record, args)</a></td>
+  
+</tr>
+
+        </table>
+      
+
+      
+
+      
+
+      
+        <section id="macros_details" class="details_list">
+          <h2>Macros</h2>
+          <section class="detail">
+  <div class="detail_header" id="xmlAttribute/1">
+    <span class="signature"><strong>xmlAttribute(args \\ [])</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(macro)</span>
+      <a href="#xmlAttribute/1" class="detail_link" title="Link to this macro">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+    <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L33" class="view_source">Source</a>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="xmlAttribute/2">
+    <span class="signature"><strong>xmlAttribute(record, args)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(macro)</span>
+      <a href="#xmlAttribute/2" class="detail_link" title="Link to this macro">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+    <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L33" class="view_source">Source</a>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="xmlElement/1">
+    <span class="signature"><strong>xmlElement(args \\ [])</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(macro)</span>
+      <a href="#xmlElement/1" class="detail_link" title="Link to this macro">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+    <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L31" class="view_source">Source</a>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="xmlElement/2">
+    <span class="signature"><strong>xmlElement(record, args)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(macro)</span>
+      <a href="#xmlElement/2" class="detail_link" title="Link to this macro">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+    <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L31" class="view_source">Source</a>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="xmlText/1">
+    <span class="signature"><strong>xmlText(args \\ [])</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(macro)</span>
+      <a href="#xmlText/1" class="detail_link" title="Link to this macro">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+    <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L32" class="view_source">Source</a>
+  
+</section>
+<section class="detail">
+  <div class="detail_header" id="xmlText/2">
+    <span class="signature"><strong>xmlText(record, args)</strong></span>
+    <div class="detail_header_links">
+      <span class="detail_type">(macro)</span>
+      <a href="#xmlText/2" class="detail_link" title="Link to this macro">#</a>
+      <a class="to_top_link" href="#content" title="To the top of the page">&uarr;</a>
+    </div>
+  </div>
+  
+  <section class="docstring">
+    
+  </section>
+  
+    <a href="https://github.com/victorolinasc/junit_formatter/blob/v0.0.1/lib/formatter.ex#L32" class="view_source">Source</a>
+  
+</section>
+
+        </section>
+      
+
+      
+    </section>
+  </body>
+</html>
