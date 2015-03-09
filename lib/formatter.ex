@@ -20,8 +20,9 @@ Therefore, here goes the mapping:
      - failed = {:state, {:failed, {_, reason, stacktrace}}}
        - reason = reason.message
        - contet = Exception.format_stacktrace(stacktrace)
+     - error = {:invalid, module}
 
-Currently it writes the results in a xml file in the project build_path.
+Currently it writes the results in an xml file in the project's build_path.
 """
 	require Record
   use GenEvent
@@ -66,7 +67,7 @@ It is used to build the testsuite junit node.
 		# wrap result in a root node (not adding any attribute to root)
 		result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
 
-		# save the report in a xml file
+		# save the report in an xml file
 		file = File.open! get_file_name(config), [:write]
 		IO.binwrite file, result
 		File.close file
