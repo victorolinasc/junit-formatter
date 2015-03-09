@@ -29,6 +29,7 @@ defmodule Formatter.Mixfile do
 
 	defp package do
 		%{licenses: ["Apache 2"],
+			contributors: ["Victor Olinasc"],
 			links: %{"Github" => "https://github.com/victorolinasc/junit_formatter"}}
 	end
 end
