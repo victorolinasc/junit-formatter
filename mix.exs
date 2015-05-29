@@ -1,7 +1,7 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
-	@version "0.0.1"
+	@version "0.0.2"
 	
   def project do
     [app: :junit_formatter,
@@ -30,7 +30,7 @@ defmodule Formatter.Mixfile do
 	defp package do
 		%{licenses: ["Apache 2"],
 			contributors: ["Victor Olinasc"],
-			links: %{"Github" => "https://github.com/victorolinasc/junit_formatter",
+			links: %{"Github" => "https://github.com/victorolinasc/junit-formatter",
 							"docs" => "http://hexdocs.pm/junit_formatter/"}}
 	end
 end
