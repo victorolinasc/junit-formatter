@@ -28,8 +28,14 @@ ExUnit.start
 Then run your tests like normal:
 
 ```
-$ mix test
-...
+Compiled lib/formatter.ex
+Generated junit_formatter app
+....
+
+Finished in 0.1 seconds (0.07s on load, 0.08s on tests)
+4 tests, 0 failures
+
+Randomized with seed 600810
 ```
 
 Your JUnit style XML report will be written to `_build/test/test-junit-report.xml`.
