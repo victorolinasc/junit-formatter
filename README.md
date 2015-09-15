@@ -24,3 +24,12 @@ If you want to keep using the default formatter alongside the `JUnitFormatter` y
 ExUnit.configure formatters: [JUnitFormatter, ExUnit.CLIFormatter]
 ExUnit.start
 ```
+
+Then run your tests like normal:
+
+```
+$ mix test
+...
+```
+
+Your JUnit style XML report will be written to `_build/test/test-junit-report.xml`.
