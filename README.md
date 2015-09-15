@@ -38,4 +38,18 @@ Finished in 0.1 seconds (0.07s on load, 0.08s on tests)
 Randomized with seed 600810
 ```
 
-Your JUnit style XML report will be written to `_build/test/test-junit-report.xml`.
+Your JUnit style XML report will be written to `_build/test/test-junit-report.xml`.  The report for this project looks like this:
+
+```
+<?xml version="1.0"?>
+<testsuites>
+	<testsuite errors="0" failures="0" name="Elixir.FormatterTest" tests="4" time="82086">
+		<testcase classname="Elixir.FormatterTest" name="test it counts raises as failures" time="16805"/>
+		<testcase classname="Elixir.FormatterTest" name="test that an invalid test generates a proper report" time="16463"/>
+		<testcase classname="Elixir.FormatterTest" name="test that a valid test generates a proper report" time="16328"/>
+		<testcase classname="Elixir.FormatterTest" name="test valid and invalid tests generates a proper report" time="32490"/>
+	</testsuite>
+</testsuites>
+```
+
+*note: this example has been reformatted for readability.*
