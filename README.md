@@ -17,3 +17,10 @@ Add `JUnitFormatter` to your `ExUnit` configuration in `test/test_helper.exs` fi
 ExUnit.configure formatters: [JUnitFormatter]
 ExUnit.start
 ```
+
+If you want to keep using the default formatter alongside the `JUnitFormatter` your `test/test_helper.exs` file should look like this:
+
+```
+ExUnit.configure formatters: [JUnitFormatter, ExUnit.CLIFormatter]
+ExUnit.start
+```
