@@ -15,14 +15,14 @@ Pictures and code examples will be added in a future release.
 
 Add `JUnitFormatter` to your `ExUnit` configuration in `test/test_helper.exs` file. It should look like this:
 
-```
+```elixir
 ExUnit.configure formatters: [JUnitFormatter]
 ExUnit.start
 ```
 
 If you want to keep using the default formatter alongside the `JUnitFormatter` your `test/test_helper.exs` file should look like this:
 
-```
+```elixir
 ExUnit.configure formatters: [JUnitFormatter, ExUnit.CLIFormatter]
 ExUnit.start
 ```
@@ -42,7 +42,7 @@ Randomized with seed 600810
 
 Your JUnit style XML report will be written to `_build/test/test-junit-report.xml`.  The report for this project looks like this:
 
-```
+```xml
 <?xml version="1.0"?>
 <testsuites>
 	<testsuite errors="0" failures="0" name="Elixir.FormatterTest" tests="4" time="82086">
