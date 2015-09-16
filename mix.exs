@@ -12,7 +12,7 @@ defmodule Formatter.Mixfile do
      description: "An ExUnit.Formatter that produces an XML report of the tests run in the project _build dir.\n" <>
        "It is a good fit with Jenkins test reporting plugin, for example.",
      name: "JUnit Formatter",
-     docs: [readme: "README.md", main: "README",
+     docs: [readme: "README.md", 
             source_ref: "v#{@version}",
             source_url: "https://github.com/victorolinasc/junit_formatter"]]
   end
@@ -23,7 +23,7 @@ defmodule Formatter.Mixfile do
 
   defp deps do
     [{:earmark, "~> 0.1", only: :docs},
-     {:ex_doc, "~> 0.7", only: :docs},
+     {:ex_doc, "~> 0.9", only: :docs},
      {:inch_ex, only: :docs}]
   end
 

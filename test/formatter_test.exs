@@ -85,7 +85,7 @@ defmodule FormatterTest do
   defp strip_time_and_line_number(output) do
     output = String.replace output, ~r/time=\"[0-9]+\"/, ""
     file = List.last String.split __ENV__.file, ~r/\//
-    String.replace output, ~r/#{file}:[0-9]+:/, file
+      String.replace output, ~r/#{file}:[0-9]+:/, file
   end
   
 end

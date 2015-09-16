@@ -1,29 +1,29 @@
 defmodule JUnitFormatter do
   @moduledoc """
-* A ExUnit.Formatter implementation that generates a xml in the format understood by JUnit.
+  * A ExUnit.Formatter implementation that generates a xml in the format understood by JUnit.
 
-To acomplish this, there are some mappings that are not straight one to one. 
-Therefore, here goes the mapping:
+  To acomplish this, there are some mappings that are not straight one to one. 
+  Therefore, here goes the mapping:
 
-- JUnit - ExUnit
-- Testsuites - :testsuite
-- Testsuite - %ExUnit.TestCase{}
+  - JUnit - ExUnit
+  - Testsuites - :testsuite
+  - Testsuite - %ExUnit.TestCase{}
   - failures = failures
   - skipped = skip
   - errors = invalid
   - time = (sum of all times)
-- Testcase - %ExUnit.Test
+  - Testcase - %ExUnit.Test
   - name = :case
   - test = :test
   - content (only if not successful)
-     - skipped = {:state, {:skip, _}}
-     - failed = {:state, {:failed, {_, reason, stacktrace}}}
-       - reason = reason.message
-       - contet = Exception.format_stacktrace(stacktrace)
-     - error = {:invalid, module}
+  - skipped = {:state, {:skip, _}}
+  - failed = {:state, {:failed, {_, reason, stacktrace}}}
+  - reason = reason.message
+  - contet = Exception.format_stacktrace(stacktrace)
+  - error = {:invalid, module}
 
-Currently it writes the results in an xml file in the project's build_path.
-"""
+  Currently it writes the results in an xml file in the project's build_path.
+  """
   require Record
   use GenEvent
 
@@ -35,10 +35,10 @@ Currently it writes the results in an xml file in the project's build_path.
   defmodule TestCaseStats do
 
     @moduledoc """
-A struct to keep track of test values and tests themselves.
+    A struct to keep track of test values and tests themselves.
 
-It is used to build the testsuite junit node.
-"""
+    It is used to build the testsuite junit node.
+    """
     defstruct errors: 0, 
     failures: 0,
     skipped: 0,
@@ -47,13 +47,13 @@ It is used to build the testsuite junit node.
     test_cases: []
 
     @type t :: %__MODULE__{
-              errors: non_neg_integer,
-              failures: non_neg_integer,
-              skipped: non_neg_integer,
-              tests: non_neg_integer,
-              time: non_neg_integer,
-              test_cases: [ExUnit.Test.t]
-              }
+      errors: non_neg_integer,
+      failures: non_neg_integer,
+      skipped: non_neg_integer,
+      tests: non_neg_integer,
+      time: non_neg_integer,
+      test_cases: [ExUnit.Test.t]
+    }
   end
   
   ## Formatter callbacks: may use opts in the future to configure file name pattern
