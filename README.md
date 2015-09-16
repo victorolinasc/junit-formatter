@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/victorolinasc/junit-formatter.svg)](https://travis-ci.org/victorolinasc/junit-formatter)
+
 JUnit Output for ExUnit
 =========
 
