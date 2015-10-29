@@ -156,7 +156,12 @@ defmodule JUnitFormatter do
   end
   defp generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}}) do
     formatted_stack = Exception.format_stacktrace(stacktrace)
-    [{:failed, [message: Atom.to_string(kind) <> ": " <> reason.message], [String.to_char_list(formatted_stack)]}]
+    message = 
+      case reason do
+        %{message: message} -> message
+        other -> inspect(other)
+      end
+    [{:failed, [message: Atom.to_string(kind) <> ": " <> message], [String.to_char_list(formatted_stack)]}]
   end
   defp generate_test_body(%ExUnit.Test{state: {:invalid, module}}) do
     [{:error, [message: "Invalid module #{inspect module}"], []}]
