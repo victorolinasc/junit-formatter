@@ -68,6 +68,20 @@ defmodule FormatterTest do
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failed message=\"error: argument error\">    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
   end
 
+  test "it can handle empty reason" do
+    defmodule RaiseWithNoReason do
+      use ExUnit.Case
+
+      test "it raises without reason" do
+        throw nil
+      end
+    end
+
+    output = run_and_capture_output |> strip_time_and_line_number
+    
+    assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failed message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failed></testcase>"
+  end
+
   # Utilities --------------------
   
   defp read_fixture(extra) do
