@@ -47,7 +47,7 @@ defmodule FormatterTest do
 
     # can't ensure order. Assert it contains both cases
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test the truth\" />"
-    assert output =~ "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failed message=\"error: Assertion with == failed\">    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failed></testcase>"
+    assert output =~ "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failure message=\"error: Assertion with == failed\">    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failure></testcase>"
 
     # assert it contains correct suite
     assert output =~ "<testsuite errors=\"0\" failures=\"1\" name=\"Elixir.FormatterTest.ValidAndInvalidTest\" tests=\"2\" >"
@@ -65,7 +65,7 @@ defmodule FormatterTest do
     output = run_and_capture_output |> strip_time_and_line_number
 
     assert output =~ "<testsuite errors=\"0\" failures=\"1\" name=\"Elixir.FormatterTest.RaiseAsFailureTest\" tests=\"1\""
-    assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failed message=\"error: argument error\">    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
+    assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failure message=\"error: argument error\">    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
   end
 
   test "it can handle empty reason" do
@@ -79,7 +79,7 @@ defmodule FormatterTest do
 
     output = run_and_capture_output |> strip_time_and_line_number
     
-    assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failed message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failed></testcase>"
+    assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
   end
 
   # Utilities --------------------
