@@ -1,2 +1,2 @@
-<?xml version="1.0"?><testsuites><testsuite errors="0" failures="1" name="Elixir.FormatterTest.FailureTest" tests="1" ><testcase classname="Elixir.FormatterTest.FailureTest" name="test it will fail" ><failed message="error: Assertion with == failed">    test/formatter_test.exs FormatterTest.FailureTest."test it will fail"/1
-</failed></testcase></testsuite></testsuites>
+<?xml version="1.0"?><testsuites><testsuite errors="0" failures="1" name="Elixir.FormatterTest.FailureTest" tests="1" ><testcase classname="Elixir.FormatterTest.FailureTest" name="test it will fail" ><failure message="error: Assertion with == failed">    test/formatter_test.exs FormatterTest.FailureTest."test it will fail"/1
+</failure></testcase></testsuite></testsuites>
