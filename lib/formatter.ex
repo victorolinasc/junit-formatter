@@ -2,7 +2,7 @@ defmodule JUnitFormatter do
   @moduledoc """
   * A ExUnit.Formatter implementation that generates a xml in the format understood by JUnit.
 
-  To acomplish this, there are some mappings that are not straight one to one. 
+  To acomplish this, there are some mappings that are not straight one to one.
   Therefore, here goes the mapping:
 
   - JUnit - ExUnit
@@ -39,7 +39,7 @@ defmodule JUnitFormatter do
 
     It is used to build the testsuite junit node.
     """
-    defstruct errors: 0, 
+    defstruct errors: 0,
     failures: 0,
     skipped: 0,
     tests: 0,
@@ -55,7 +55,7 @@ defmodule JUnitFormatter do
       test_cases: [ExUnit.Test.t]
     }
   end
-  
+
   ## Formatter callbacks: may use opts in the future to configure file name pattern
   def init(_opts) do
     {:ok, []}
@@ -123,7 +123,7 @@ defmodule JUnitFormatter do
     stats = %{ stats | time: stats.time + test.time }
     %{ stats | test_cases: [ test | stats.test_cases] }
   end
-  
+
   # Retrieves the report file name. It may use config in the future to customize this option.
   defp get_file_name(_config) do
     report = Application.get_env :junit_formatter, :report_file, "test-junit-report.xml"
@@ -135,7 +135,7 @@ defmodule JUnitFormatter do
                   failures: stats.failures,
                   name: name,
                   tests: stats.tests,
-                  time: stats.time], 
+                  time: stats.time],
      for test <- stats.test_cases do
        generate_testcases(test)
      end
@@ -154,9 +154,12 @@ defmodule JUnitFormatter do
   defp generate_test_body(%ExUnit.Test{state: {:skip, _}}) do
     [{:skipped, [], []}]
   end
+  defp generate_test_body(%ExUnit.Test{state: {:failed, [{kind, reason, stacktrace}|_]}}) do
+    generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}})
+  end
   defp generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}}) do
     formatted_stack = Exception.format_stacktrace(stacktrace)
-    message = 
+    message =
       case reason do
         %{message: message} -> message
         other -> inspect(other)
