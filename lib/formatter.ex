@@ -22,7 +22,7 @@ defmodule JUnitFormatter do
   - contet = Exception.format_stacktrace(stacktrace)
   - error = {:invalid, module}
 
-  Currently it writes the results in an xml file in the project's build_path.
+	The report is written to a file in the _build directory.
   """
   require Record
   use GenEvent
