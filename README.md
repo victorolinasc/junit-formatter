@@ -1,22 +1,22 @@
-[![Build Status](https://travis-ci.org/victorolinasc/junit-formatter.svg)](https://travis-ci.org/victorolinasc/junit-formatter)
-
-JUnit Output for ExUnit
+JUnitFormatter
 =========
+
+[![Build Status](https://travis-ci.org/victorolinasc/junit-formatter.svg)](https://travis-ci.org/victorolinasc/junit-formatter)  [![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](http://hexdocs.pm/junit_formatter/)  [![Downloads](https://img.shields.io/hexpm/dt/junit_formatter.svg)](https://hex.pm/packages/junit_formatter)
 
 A simple ExUnit Formatter that collects test results and generates an xml report in JUnit format. This is intended to be used by tools that can produce a graphical report, mainly targeted at Jenkins and its support for JUnit.
 
 The report is generated in _build/test folder with a default filename of test-junit-report.xml. It can be configured through application configuration on the key report_file (application junit_formatter).
 
-Pictures and code examples will be added in a future release.
-
 ## Usage
 
 Add `JUnitFormatter` to your `ExUnit` configuration in `test/test_helper.exs` file. It should look like this:
+
 
 ```elixir
 ExUnit.configure formatters: [JUnitFormatter]
 ExUnit.start
 ```
+
 
 If you want to keep using the default formatter alongside the `JUnitFormatter` your `test/test_helper.exs` file should look like this:
 
@@ -53,3 +53,20 @@ Your JUnit style XML report will be written to `_build/test/test-junit-report.xm
 ```
 
 *note: this example has been reformatted for readability.*
+
+## Options
+
+`JUnitFormatter` accepts 2 options that can be passed in config.exs (or equivalent environment configuration for tests):
+
+- `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console (`IO.puts "Wrote JUnit report to: #{file_name}"`). This might help you debug where the file is.
+- `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an xml document). 
+
+Example configuration: 
+
+``` elixir
+config :junit_formatter,
+  report_file: "report_file_test.xml",
+  print_report_file: true
+```
+
+

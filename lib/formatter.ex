@@ -11,7 +11,7 @@ defmodule JUnitFormatter do
   - failures = failures
   - skipped = skip
   - errors = invalid
-  - time = (sum of all times)
+  - time = (sum of all times in seconds rounded down)
   - Testcase - %ExUnit.Test
   - name = :case
   - test = :test
@@ -22,7 +22,7 @@ defmodule JUnitFormatter do
   - contet = Exception.format_stacktrace(stacktrace)
   - error = {:invalid, module}
 
-	The report is written to a file in the _build directory.
+  The report is written to a file in the _build directory.
   """
   require Record
   use GenEvent
@@ -57,9 +57,7 @@ defmodule JUnitFormatter do
   end
 
   ## Formatter callbacks: may use opts in the future to configure file name pattern
-  def init(_opts) do
-    {:ok, []}
-  end
+  def init(_opts), do: {:ok, []}
 
   def handle_event({:suite_finished, _run_us, _load_us}, config) do
     # do the real magic
@@ -68,10 +66,15 @@ defmodule JUnitFormatter do
     result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
 
     # save the report in an xml file
-    file = File.open! get_file_name(config), [:write]
+    file_name = get_file_name(config)
+    file = File.open! file_name, [:write]
     IO.binwrite file, result
     File.close file
 
+    if Application.get_env :junit_formatter, :print_report_file, false do
+      IO.puts "Wrote JUnit report to: #{file_name}"
+    end
+    
     # Release handler
     :remove_handler
   end
@@ -87,7 +90,7 @@ defmodule JUnitFormatter do
   def handle_event({:test_finished, %ExUnit.Test{state: {:skip, _}} = test}, config) do
 
     stats = adjust_case_stats(test, config)
-    stats = %{ stats | skipped: stats.skipped + 1 }
+    stats = %{stats | skipped: stats.skipped + 1}
     config = Keyword.put config, test.case, stats
 
     {:ok, config}
@@ -96,7 +99,7 @@ defmodule JUnitFormatter do
   def handle_event({:test_finished, %ExUnit.Test{state: {:failed, _failed}} = test}, config) do
 
     stats = adjust_case_stats(test, config)
-    stats = %{ stats | failures: stats.failures + 1 }
+    stats = %{stats | failures: stats.failures + 1}
     config = Keyword.put config, test.case, stats
 
     {:ok, config}
@@ -105,7 +108,7 @@ defmodule JUnitFormatter do
   def handle_event({:test_finished, %ExUnit.Test{state: {:invalid, _module}} = test}, config) do
 
     stats = adjust_case_stats(test, config)
-    stats = %{ stats | errors: stats.errors + 1 }
+    stats = %{stats | errors: stats.errors + 1}
     config = Keyword.put config, test.case, stats
 
     {:ok, config}
@@ -119,9 +122,9 @@ defmodule JUnitFormatter do
 
   defp adjust_case_stats(%ExUnit.Test{} = test, config) do
     stats = Keyword.get config, test.case,  %JUnitFormatter.TestCaseStats{}
-    stats = %{ stats | tests: stats.tests + 1 }
-    stats = %{ stats | time: stats.time + test.time }
-    %{ stats | test_cases: [ test | stats.test_cases] }
+    stats = %{stats | tests: stats.tests + 1}
+    stats = %{stats | time: stats.time + test.time}
+    %{stats | test_cases: [test | stats.test_cases]}
   end
 
   # Retrieves the report file name. It may use config in the future to customize this option.
@@ -135,12 +138,14 @@ defmodule JUnitFormatter do
                   failures: stats.failures,
                   name: name,
                   tests: stats.tests,
-                  time: stats.time],
+                  time: normalize_us(stats.time)],
      for test <- stats.test_cases do
        generate_testcases(test)
      end
     }
   end
+
+  defp normalize_us(us), do: div(us, 1000000)
 
   defp generate_testcases(test) do
     {:testcase, [classname: Atom.to_char_list(test.case),
