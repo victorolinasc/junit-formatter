@@ -3,6 +3,8 @@ defmodule FormatterTest do
 
   test "that a valid test generates a proper report" do
 
+    :timer.sleep 1223
+    
     defmodule ValidTest do
       use ExUnit.Case
 
@@ -82,6 +84,14 @@ defmodule FormatterTest do
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
   end
 
+  test "it can format time" do
+    assert JUnitFormatter.format_time(1000000) == "1.0"
+    assert JUnitFormatter.format_time(10000) == "0.01"
+    assert JUnitFormatter.format_time(20000) == "0.02"
+    assert JUnitFormatter.format_time(110000) == "0.1"
+    assert JUnitFormatter.format_time(1100000) == "1.1"
+  end
+  
   # Utilities --------------------
   
   defp read_fixture(extra) do
@@ -97,7 +107,7 @@ defmodule FormatterTest do
   end
 
   defp strip_time_and_line_number(output) do
-    output = String.replace output, ~r/time=\"[0-9]+\"/, ""
+    output = String.replace output, ~r/time=\"[0-9]+\.[0-9]+\"/, ""
     file = List.last String.split __ENV__.file, ~r/\//
       String.replace output, ~r/#{file}:[0-9]+:/, file
   end

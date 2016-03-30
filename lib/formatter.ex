@@ -118,6 +118,8 @@ defmodule JUnitFormatter do
     {:ok, config}
   end
 
+  def format_time(time), do: time |> us_to_ms |> format_ms
+    
   # PRIVATE ------------
 
   defp adjust_case_stats(%ExUnit.Test{} = test, config) do
@@ -138,19 +140,28 @@ defmodule JUnitFormatter do
                   failures: stats.failures,
                   name: name,
                   tests: stats.tests,
-                  time: normalize_us(stats.time)],
+                  time: stats.time |> format_time],
      for test <- stats.test_cases do
        generate_testcases(test)
      end
     }
   end
 
-  defp normalize_us(us), do: div(us, 1000000)
+  defp us_to_ms(us), do: div(us, 10000)
 
+  defp format_ms(ms) do
+    if ms < 10 do
+      "0.0#{ms}"
+    else
+      ms = div ms, 10
+      "#{div(ms, 10)}.#{rem(ms, 10)}"
+    end
+  end
+  
   defp generate_testcases(test) do
     {:testcase, [classname: Atom.to_char_list(test.case),
                  name: Atom.to_char_list(test.name),
-                 time: test.time],
+                 time: test.time |> us_to_ms |> format_ms],
      generate_test_body(test)
     }
   end
