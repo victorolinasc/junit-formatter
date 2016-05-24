@@ -1,3 +1,17 @@
+## v1.1.0
+
+### Backwards incompatible: 
+
+  - This release has changed the location where the report is written to. 
+
+### Features:
+
+  - Changed implementation of logging report file location to use `Logger`. This is meant to be more helpful in configuring since it can be disabled in Logger level.
+
+### Bugfixes:
+
+  - Support for umbrella projects. Reports are written to `Mix.Project.app_path` instead of `Mix.Project.build_path`.
+
 ## v1.0.0
 
 ### Features:

@@ -131,8 +131,16 @@ defmodule JUnitFormatter do
 
   # Retrieves the report file name. It may use config in the future to customize this option.
   defp get_file_name(_config) do
+    require Logger
+
     report = Application.get_env :junit_formatter, :report_file, "test-junit-report.xml"
-    Mix.Project.build_path <> "/" <> report
+    debug = Application.get_env :junit_formatter, :print_report_file, false
+    report_path = Mix.Project.app_path <> "/" <> report
+    
+    if debug,
+      do: Logger.debug fn -> "Junit-formatter report at: #{report_path}" end
+
+    report_path
   end
 
   defp generate_testsuite_xml({name, %TestCaseStats{} = stats}) do

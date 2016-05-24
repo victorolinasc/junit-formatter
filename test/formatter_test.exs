@@ -103,7 +103,7 @@ defmodule FormatterTest do
     ExUnit.run
 
     report = Application.get_env :junit_formatter, :report_file, "test-junit-report.xml"
-    File.read!(Mix.Project.build_path <> "/" <> report) <> "\n"
+    File.read!(Mix.Project.app_path <> "/" <> report) <> "\n"
   end
 
   defp strip_time_and_line_number(output) do
