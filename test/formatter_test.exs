@@ -114,7 +114,13 @@ defmodule FormatterTest do
 
   defp run_and_capture_output do
     ExUnit.configure formatters: [JUnitFormatter]
-    ExUnit.Server.cases_loaded()
+
+    # Elixir 1.3 introduced this function changing the behaviour of custom calls
+    # to ExUnit.run. We need to call this function if available.
+    if Keyword.has_key?(ExUnit.Server.__info__(:functions), :cases_loaded) do
+      ExUnit.Server.cases_loaded()
+    end
+
     ExUnit.run 
     File.read!(JUnitFormatter.get_report_file_path) <> "\n"
   end
