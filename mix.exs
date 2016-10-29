@@ -1,7 +1,7 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
-  @version "1.1.0"
+  @version "1.2.0"
   
   def project do
     [app: :junit_formatter,
@@ -13,10 +13,10 @@ defmodule Formatter.Mixfile do
      description: description,
      name: "JUnit Formatter",
      test_coverage: [tool: ExCoveralls],
-     docs: [extras: ["README.md": [title: "Overview", path: "overview"],
+     docs: [extras: ["README.md": [title: "Overview"],
                      "CHANGELOG.md": [title: "Changelog"]],
-            main: "overview",
-						source_ref: "v#{@version}",
+            main: "readme",
+            source_ref: "v#{@version}",
             source_url: "https://github.com/victorolinasc/junit-formatter"]
     ]
   end
@@ -27,10 +27,10 @@ defmodule Formatter.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 0.2", only: :docs},
-      {:ex_doc, "~> 0.11", only: :docs},
+      {:earmark, "~> 1.0", only: :docs},
+      {:ex_doc, "~> 0.14", only: :docs},
       {:excoveralls, "~> 0.5", only: :test},
-      {:credo, "~> 0.3", only: [:dev, :test]}
+      {:credo, "~> 0.5", only: [:dev, :test]}
     ]
   end
 

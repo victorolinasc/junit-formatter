@@ -60,12 +60,14 @@ Your JUnit style XML report will be written to `_build/test/test-junit-report.xm
 
 - `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console (`Logger.debug fn -> "Junit-formatter report at: #{report_path}" end`). This might help you debug where the file is. By default it writes the report to the `Mix.Project.app_path` folder. This ensures compatibility with umbrella apps.
 - `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an xml document). 
+- `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash.
 
 Example configuration: 
 
 ``` elixir
 config :junit_formatter,
   report_file: "report_file_test.xml",
+  report_dir: "/tmp",
   print_report_file: true
 ```
 

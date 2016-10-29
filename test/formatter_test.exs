@@ -1,13 +1,11 @@
 defmodule FormatterTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: false
 
   test "that a valid test generates a proper report" do
-
-    :timer.sleep 1223
     
     defmodule ValidTest do
       use ExUnit.Case
-
+      
       test "the truth" do
         assert 1 + 1 == 2
       end
@@ -91,19 +89,34 @@ defmodule FormatterTest do
     assert JUnitFormatter.format_time(110000) == "0.1"
     assert JUnitFormatter.format_time(1100000) == "1.1"
   end
+
+  test "it can retrieve report file path" do
+
+    # default
+    assert get_config(:report_file) == "report_file_test.xml"
+
+    assert JUnitFormatter.get_report_file_path == "#{Mix.Project.app_path}/report_file_test.xml"
+
+    put_config(:report_file, "abc.xml")
+    assert JUnitFormatter.get_report_file_path == "#{Mix.Project.app_path}/abc.xml"
+
+    put_config(:report_dir, "/tmp")
+    assert JUnitFormatter.get_report_file_path == "/tmp/abc.xml"
+  end
   
   # Utilities --------------------
+  defp get_config(name), do: Application.get_env(:junit_formatter, name)
+  defp put_config(name, value), do: Application.put_env(:junit_formatter, name, value)
   
   defp read_fixture(extra) do
-    File.read! Path.join(Path.expand("fixtures", __DIR__), extra)
+    Path.expand("fixtures", __DIR__) |> Path.join(extra) |> File.read!
   end
 
   defp run_and_capture_output do
     ExUnit.configure formatters: [JUnitFormatter]
-    ExUnit.run
-
-    report = Application.get_env :junit_formatter, :report_file, "test-junit-report.xml"
-    File.read!(Mix.Project.app_path <> "/" <> report) <> "\n"
+    ExUnit.Server.cases_loaded()
+    ExUnit.run 
+    File.read!(JUnitFormatter.get_report_file_path) <> "\n"
   end
 
   defp strip_time_and_line_number(output) do

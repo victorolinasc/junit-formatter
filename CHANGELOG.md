@@ -1,3 +1,10 @@
+## v1.2.0
+
+### Features:
+
+  - Added config property `report_dir`. This makes it possible to set absolute paths for the generated reports.
+  - Added helper function `JUnitFormatter.get_report_file_path/0` that returns the final path of the report with the applied defaults and configurations.
+
 ## v1.1.0
 
 ### Backwards incompatible: 
