@@ -6,7 +6,7 @@ defmodule Formatter.Mixfile do
   def project do
     [app: :junit_formatter,
      version: @version,
-     elixir: "~> 1.0",
+     elixir: "~> 1.1",
      deps: deps,
      package: package,
      consolidate_protocols: Mix.env != :test,

@@ -1,5 +1,9 @@
 ## v1.2.0
 
+### Backwards incompatible:
+
+  - This release raises the minimum Elixir version to 1.1 and is only tested with Erlang 18 and above.
+
 ### Features:
 
   - Added config property `report_dir`. This makes it possible to set absolute paths for the generated reports.
