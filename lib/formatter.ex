@@ -198,6 +198,7 @@ defmodule JUnitFormatter do
     formatted_stack = Exception.format_stacktrace(stacktrace)
     message =
       case reason do
+        %{postgres: postgresError} -> "Postgres: in table " <> postgresError.table <> ", " <> postgresError.message
         %{message: message} -> message
         other -> inspect(other)
       end
