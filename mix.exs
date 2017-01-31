@@ -2,15 +2,15 @@ defmodule Formatter.Mixfile do
   use Mix.Project
 
   @version "1.2.0"
-  
+
   def project do
     [app: :junit_formatter,
      version: @version,
      elixir: "~> 1.1",
-     deps: deps,
-     package: package,
+     deps: deps(),
+     package: package(),
      consolidate_protocols: Mix.env != :test,
-     description: description,
+     description: description(),
      name: "JUnit Formatter",
      test_coverage: [tool: ExCoveralls],
      docs: [extras: ["README.md": [title: "Overview"],

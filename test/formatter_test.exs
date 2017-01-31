@@ -2,16 +2,16 @@ defmodule FormatterTest do
   use ExUnit.Case, async: false
 
   test "that a valid test generates a proper report" do
-    
+
     defmodule ValidTest do
       use ExUnit.Case
-      
+
       test "the truth" do
         assert 1 + 1 == 2
       end
     end
 
-    output = run_and_capture_output |> strip_time_and_line_number
+    output = run_and_capture_output() |> strip_time_and_line_number
     assert output =~ read_fixture("valid_test.xml")
   end
 
@@ -25,7 +25,7 @@ defmodule FormatterTest do
       end
     end
 
-    output = run_and_capture_output |> strip_time_and_line_number
+    output = run_and_capture_output() |> strip_time_and_line_number
     assert output =~ read_fixture("invalid_test.xml")
   end
 
@@ -43,7 +43,7 @@ defmodule FormatterTest do
       end
     end
 
-    output = run_and_capture_output |> strip_time_and_line_number
+    output = run_and_capture_output() |> strip_time_and_line_number
 
     # can't ensure order. Assert it contains both cases
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test the truth\" />"
@@ -62,7 +62,7 @@ defmodule FormatterTest do
       end
     end
 
-    output = run_and_capture_output |> strip_time_and_line_number
+    output = run_and_capture_output() |> strip_time_and_line_number
 
     assert output =~ "<testsuite errors=\"0\" failures=\"1\" name=\"Elixir.FormatterTest.RaiseAsFailureTest\" tests=\"1\""
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failure message=\"error: argument error\">    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
@@ -77,8 +77,8 @@ defmodule FormatterTest do
       end
     end
 
-    output = run_and_capture_output |> strip_time_and_line_number
-    
+    output = run_and_capture_output() |> strip_time_and_line_number
+
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
   end
 
@@ -103,11 +103,11 @@ defmodule FormatterTest do
     put_config(:report_dir, "/tmp")
     assert JUnitFormatter.get_report_file_path == "/tmp/abc.xml"
   end
-  
+
   # Utilities --------------------
   defp get_config(name), do: Application.get_env(:junit_formatter, name)
   defp put_config(name, value), do: Application.put_env(:junit_formatter, name, value)
-  
+
   defp read_fixture(extra) do
     Path.expand("fixtures", __DIR__) |> Path.join(extra) |> File.read!
   end
@@ -121,7 +121,7 @@ defmodule FormatterTest do
       ExUnit.Server.cases_loaded()
     end
 
-    ExUnit.run 
+    ExUnit.run
     File.read!(JUnitFormatter.get_report_file_path) <> "\n"
   end
 
@@ -130,5 +130,5 @@ defmodule FormatterTest do
     file = List.last String.split __ENV__.file, ~r/\//
       String.replace output, ~r/#{file}:[0-9]+:/, file
   end
-  
+
 end
