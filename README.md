@@ -38,7 +38,7 @@ Finished in 0.1 seconds (0.07s on load, 0.08s on tests)
 Randomized with seed 600810
 ```
 
-Your JUnit style XML report will be written to `_build/test/test-junit-report.xml`.  The report for this project looks like this:
+The JUnit style XML report for this project looks like this:
 
 ```xml
 <?xml version="1.0"?>
