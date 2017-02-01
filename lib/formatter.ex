@@ -75,7 +75,7 @@ defmodule JUnitFormatter do
       require Logger
       Logger.debug "Wrote JUnit report to: #{file_name}"
     end
-    
+
     # Release handler
     :remove_handler
   end
@@ -123,7 +123,7 @@ defmodule JUnitFormatter do
   def format_time(time), do: time |> us_to_ms |> format_ms
 
   @doc """
-  Helper function to get the full path of the generated report file. 
+  Helper function to get the full path of the generated report file.
   It can be passed 2 configurations
   - report_dir: full path of a directory (defaults to `Mix.Project.app_path()`)
   - report_file: name of the generated file (defaults to "test-junit-report.xml")
@@ -133,7 +133,7 @@ defmodule JUnitFormatter do
     report_dir = Application.get_env :junit_formatter, :report_dir, Mix.Project.app_path
     "#{report_dir}/#{report_file}"
   end
-  
+
   # PRIVATE ------------
 
   defp adjust_case_stats(%ExUnit.Test{} = test, config) do
@@ -147,9 +147,9 @@ defmodule JUnitFormatter do
   defp get_file_name(_config) do
     require Logger
 
-    report_path = get_report_file_path
+    report_path = get_report_file_path()
     debug = Application.get_env :junit_formatter, :print_report_file, false
-    
+
     if debug,
       do: Logger.debug fn -> "Junit-formatter report at: #{report_path}" end
 
@@ -178,7 +178,7 @@ defmodule JUnitFormatter do
       "#{div(ms, 10)}.#{rem(ms, 10)}"
     end
   end
-  
+
   defp generate_testcases(test) do
     {:testcase, [classname: Atom.to_char_list(test.case),
                  name: Atom.to_char_list(test.name),
