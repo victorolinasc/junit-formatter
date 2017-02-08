@@ -82,6 +82,24 @@ defmodule FormatterTest do
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
   end
 
+  test "it can handle empty message" do
+    defmodule NilMessageError do
+      defexception [message: nil, customMessage: "A custom error occured !"]
+    end
+
+    defmodule RaiseWithNoMessage do
+      use ExUnit.Case
+
+      test "it raises without message" do
+        raise NilMessageError
+      end
+    end
+
+    output = run_and_capture_output |> strip_time_and_line_number
+
+    assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil}\">    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
+  end
+
   test "it can format time" do
     assert JUnitFormatter.format_time(1000000) == "1.0"
     assert JUnitFormatter.format_time(10000) == "0.01"
