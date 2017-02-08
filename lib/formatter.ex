@@ -198,6 +198,7 @@ defmodule JUnitFormatter do
     formatted_stack = Exception.format_stacktrace(stacktrace)
     message =
       case reason do
+        %{message: nil} -> inspect(reason)
         %{message: message} -> message
         other -> inspect(other)
       end
