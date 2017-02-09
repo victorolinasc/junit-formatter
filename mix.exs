@@ -27,8 +27,8 @@ defmodule Formatter.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 1.1", only: :docs},
-      {:ex_doc, "~> 0.14", only: :docs},
+      {:earmark, "~> 1.1", only: :dev},
+      {:ex_doc, "~> 0.14", only: :dev},
       {:excoveralls, "~> 0.6", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
       {:credo, "~> 0.6", only: [:dev, :test]}
@@ -37,7 +37,7 @@ defmodule Formatter.Mixfile do
 
   defp package do
     [
-      files: ["lib", "priv", "mix.exs", "README*", "readme*", "LICENSE*", "CHANGELOG*"],
+      files: ["lib", "mix.exs", "README*", "LICENSE*", "CHANGELOG*"],
       maintainers: ["Victor Nascimento"],
       licenses: ["Apache 2.0"],
       links: %{"Github" => "https://github.com/victorolinasc/junit-formatter",
