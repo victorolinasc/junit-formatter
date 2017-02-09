@@ -95,9 +95,24 @@ defmodule FormatterTest do
       end
     end
 
-    output = run_and_capture_output |> strip_time_and_line_number
+    output = run_and_capture_output() |> strip_time_and_line_number()
 
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil}\">    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
+  end
+
+  test "it can count skipped tests" do
+    defmodule SkipTest do
+      use ExUnit.Case
+
+      @tag :skip
+      test "it just skips" do
+        :ok
+      end
+    end
+
+    output = run_and_capture_output() |> strip_time_and_line_number()
+
+    assert output =~ "<testcase classname=\"Elixir.FormatterTest.SkipTest\" name=\"test it just skips\" ><skipped/></testcase>"
   end
 
   test "it can format time" do
@@ -131,7 +146,7 @@ defmodule FormatterTest do
   end
 
   defp run_and_capture_output do
-    ExUnit.configure formatters: [JUnitFormatter]
+    ExUnit.configure(formatters: [JUnitFormatter], exclude: :skip)
 
     # Elixir 1.3 introduced this function changing the behaviour of custom calls
     # to ExUnit.run. We need to call this function if available.

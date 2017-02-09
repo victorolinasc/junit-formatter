@@ -1,7 +1,7 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
-  @version "1.2.0"
+  @version "1.3.0"
 
   def project do
     [app: :junit_formatter,
@@ -27,10 +27,11 @@ defmodule Formatter.Mixfile do
 
   defp deps do
     [
-      {:earmark, "~> 1.0", only: :docs},
+      {:earmark, "~> 1.1", only: :docs},
       {:ex_doc, "~> 0.14", only: :docs},
-      {:excoveralls, "~> 0.5", only: :test},
-      {:credo, "~> 0.5", only: [:dev, :test]}
+      {:excoveralls, "~> 0.6", only: :test},
+      {:exjsx, "~> 4.0", only: :test, override: true},
+      {:credo, "~> 0.6", only: [:dev, :test]}
     ]
   end
 
