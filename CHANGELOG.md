@@ -1,3 +1,11 @@
+## v1.3.0
+
+### Bugfixes:
+
+  - Handle errors that have a message with value `nil` properly. Thanks to @PierrePIRONIN.
+  - Fixed Elixir 1.4+ warnings. Thanks to @jwfearn.
+  - Improved test coverage (added skip tests).
+
 ## v1.2.0
 
 ### Backwards incompatible:
