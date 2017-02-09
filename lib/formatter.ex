@@ -57,6 +57,7 @@ defmodule JUnitFormatter do
   end
 
   ## Formatter callbacks: may use opts in the future to configure file name pattern
+    
   def init(_opts), do: {:ok, []}
 
   def handle_event({:suite_finished, _run_us, _load_us}, config) do
@@ -120,6 +121,7 @@ defmodule JUnitFormatter do
   end
 
   @doc "Formats time from nanos to seconds"
+  @spec format_time(integer) :: integer
   def format_time(time), do: time |> us_to_ms |> format_ms
 
   @doc """
@@ -128,6 +130,7 @@ defmodule JUnitFormatter do
   - report_dir: full path of a directory (defaults to `Mix.Project.app_path()`)
   - report_file: name of the generated file (defaults to "test-junit-report.xml")
   """
+  @spec get_report_file_path() :: String.t
   def get_report_file_path() do
     report_file = Application.get_env :junit_formatter, :report_file, "test-junit-report.xml"
     report_dir = Application.get_env :junit_formatter, :report_dir, Mix.Project.app_path
@@ -137,7 +140,7 @@ defmodule JUnitFormatter do
   # PRIVATE ------------
 
   defp adjust_case_stats(%ExUnit.Test{} = test, config) do
-    stats = Keyword.get config, test.case,  %JUnitFormatter.TestCaseStats{}
+    stats = Keyword.get(config, test.case,  %JUnitFormatter.TestCaseStats{})
     stats = %{stats | tests: stats.tests + 1}
     stats = %{stats | time: stats.time + test.time}
     %{stats | test_cases: [test | stats.test_cases]}
@@ -161,14 +164,14 @@ defmodule JUnitFormatter do
                   failures: stats.failures,
                   name: name,
                   tests: stats.tests,
-                  time: stats.time |> format_time],
+                  time: stats.time |> format_time()],
      for test <- stats.test_cases do
        generate_testcases(test)
      end
     }
   end
 
-  defp us_to_ms(us), do: div(us, 10000)
+  defp us_to_ms(us), do: div(us, 10_000)
 
   defp format_ms(ms) do
     if ms < 10 do
