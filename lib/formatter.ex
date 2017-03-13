@@ -57,7 +57,7 @@ defmodule JUnitFormatter do
   end
 
   ## Formatter callbacks: may use opts in the future to configure file name pattern
-    
+
   def init(_opts), do: {:ok, []}
 
   def handle_event({:suite_finished, _run_us, _load_us}, config) do
@@ -68,6 +68,7 @@ defmodule JUnitFormatter do
 
     # save the report in an xml file
     file_name = get_file_name(config)
+    if !File.exists?(Path.dirname(file_name)), do: File.mkdir_p(Path.dirname(file_name))
     file = File.open! file_name, [:write]
     IO.binwrite file, result
     File.close file
