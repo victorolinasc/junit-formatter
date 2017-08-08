@@ -25,7 +25,7 @@ defmodule JUnitFormatter do
   The report is written to a file in the _build directory.
   """
   require Record
-  use GenEvent
+  use GenServer
 
   # Needed to use :xmerl
   Record.defrecord :xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl")
@@ -57,10 +57,10 @@ defmodule JUnitFormatter do
   end
 
   ## Formatter callbacks: may use opts in the future to configure file name pattern
-    
+
   def init(_opts), do: {:ok, []}
 
-  def handle_event({:suite_finished, _run_us, _load_us}, config) do
+  def handle_cast({:suite_finished, _run_us, _load_us}, config) do
     # do the real magic
     suites = Enum.map config, &generate_testsuite_xml/1
     # wrap result in a root node (not adding any attribute to root)
@@ -77,47 +77,46 @@ defmodule JUnitFormatter do
       Logger.debug "Wrote JUnit report to: #{file_name}"
     end
 
-    # Release handler
-    :remove_handler
+    {:noreply, config}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{state: nil} = test}, config) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: nil} = test}, config) do
 
     stats = adjust_case_stats(test, config)
     config = Keyword.put config, test.case, stats
 
-    {:ok, config}
+    {:noreply, config}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{state: {:skip, _}} = test}, config) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: {:skip, _}} = test}, config) do
 
     stats = adjust_case_stats(test, config)
     stats = %{stats | skipped: stats.skipped + 1}
     config = Keyword.put config, test.case, stats
 
-    {:ok, config}
+    {:noreply, config}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{state: {:failed, _failed}} = test}, config) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: {:failed, _failed}} = test}, config) do
 
     stats = adjust_case_stats(test, config)
     stats = %{stats | failures: stats.failures + 1}
     config = Keyword.put config, test.case, stats
 
-    {:ok, config}
+    {:noreply, config}
   end
 
-  def handle_event({:test_finished, %ExUnit.Test{state: {:invalid, _module}} = test}, config) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: {:invalid, _module}} = test}, config) do
 
     stats = adjust_case_stats(test, config)
     stats = %{stats | errors: stats.errors + 1}
     config = Keyword.put config, test.case, stats
 
-    {:ok, config}
+    {:noreply, config}
   end
 
-  def handle_event(_event, config) do
-    {:ok, config}
+  def handle_cast(_event, config) do
+    {:noreply, config}
   end
 
   @doc "Formats time from nanos to seconds"
