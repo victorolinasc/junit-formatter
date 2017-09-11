@@ -13,7 +13,17 @@ Versions 2+ require minimum Elixir version to be 1.4+. For older releases, pleas
 
 ## Usage
 
-Add `JUnitFormatter` to your `ExUnit` configuration in `test/test_helper.exs` file. It should look like this:
+First, add `JUnitFormatter` to the dependencies in your mix.exs:
+
+```elixir
+  defp deps do
+    [
+      {:junit_formatter, "~> 1.3", only: [:test]}
+    ]
+  end
+```
+
+Next, add `JUnitFormatter` to your `ExUnit` configuration in `test/test_helper.exs` file. It should look like this:
 
 
 ```elixir
