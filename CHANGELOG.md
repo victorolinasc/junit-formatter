@@ -1,3 +1,9 @@
+## 2.0.0
+
+### Backwards incompatible:
+
+  - This release raises the minimum Elixir version to 1.4. This is due to GenEvent handlers for ExUni.Formatter being deprecated in Elixir 1.4.
+
 ## v1.3.0
 
 ### Bugfixes:

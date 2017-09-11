@@ -7,6 +7,10 @@ A simple ExUnit Formatter that collects test results and generates an xml report
 
 The report is generated in `Mix.Project.app_path` folder with a default filename of test-junit-report.xml. It can be configured through application configuration on the key report_file (application junit_formatter).
 
+## OBSERVATION
+
+Versions 2+ require minimum Elixir version to be 1.4+. For older releases, please use version 1.3 of this library.
+
 ## Usage
 
 Add `JUnitFormatter` to your `ExUnit` configuration in `test/test_helper.exs` file. It should look like this:
@@ -28,8 +32,6 @@ ExUnit.start
 Then run your tests like normal:
 
 ```
-Compiled lib/formatter.ex
-Generated junit_formatter app
 ....
 
 Finished in 0.1 seconds (0.07s on load, 0.08s on tests)
@@ -60,7 +62,7 @@ The JUnit style XML report for this project looks like this:
 
 - `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console (`Logger.debug fn -> "Junit-formatter report at: #{report_path}" end`). This might help you debug where the file is. By default it writes the report to the `Mix.Project.app_path` folder. This ensures compatibility with umbrella apps.
 - `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an xml document). 
-- `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash.
+- `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash. **IMPORTANT!!** `JUnitFormatter` will **NOT** create the directory. If you are pointing to a directory that is outside _build then it is your duty to clean it and to be sure it exists.
 
 Example configuration: 
 
@@ -71,4 +73,6 @@ config :junit_formatter,
   print_report_file: true
 ```
 
+## LICENSE
 
+This project is available under Apache Public License version 2.0. See [LICENSE](https://github.com/victorolinasc/junit-formatter/blob/master/LICENSE).
