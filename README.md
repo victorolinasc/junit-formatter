@@ -18,7 +18,7 @@ First, add `JUnitFormatter` to the dependencies in your mix.exs:
 ```elixir
   defp deps do
     [
-      {:junit_formatter, "~> 1.3", only: [:test]}
+      {:junit_formatter, "~> 2.0", only: [:test]}
     ]
   end
 ```
