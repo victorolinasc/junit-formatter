@@ -82,6 +82,22 @@ defmodule FormatterTest do
     assert output =~ "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
   end
 
+  @tag :capture_log
+  test "it can handle crashed process" do
+    defmodule RaiseCrash do
+      use ExUnit.Case
+
+      test "it crashes" do
+        spawn_link(fn -> raise ArgumentError end)
+        receive do end
+      end
+    end
+
+    output = run_and_capture_output() |> strip_time_and_line_number
+
+    assert output =~ ~r/<testcase classname=\"Elixir.FormatterTest.RaiseCrash\" name=\"test it crashes\" ><failure message=\"{:EXIT, #PID&lt;0.\d+.0>}: {%ArgumentError{message: &quot;argument error&quot;}, .*?\">\n<\/failure><\/testcase>/
+  end
+
   test "it can handle empty message" do
     defmodule NilMessageError do
       defexception [message: nil, customMessage: "A custom error occured !"]
