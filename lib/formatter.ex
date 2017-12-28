@@ -204,7 +204,12 @@ defmodule JUnitFormatter do
         %{message: message} -> message
         other -> inspect(other)
       end
-    [{:failure, [message: Atom.to_string(kind) <> ": " <> message], [String.to_charlist(formatted_stack)]}]
+    exception_kind =
+      case kind do
+        error when is_atom(error) -> Atom.to_string(error)
+        other -> inspect(other)
+      end
+    [{:failure, [message: exception_kind <> ": " <> message], [String.to_charlist(formatted_stack)]}]
   end
   defp generate_test_body(%ExUnit.Test{state: {:invalid, module}}) do
     [{:error, [message: "Invalid module #{inspect module}"], []}]
