@@ -1,8 +1,15 @@
+## 2.1.0
+
+### Bugfixes:
+
+  - Fixes subprocess crashes. When a subprocess crashes it sends a {:EXIT, pid} message that can't be parsed by Atom.to_string/1. Thanks to @dmt!
+  - Fixes running on Elixir 1.6.0-rc.0. `ExUnit.Server.cases_loaded()` got renamed to `ExUnit.Server.modules_loaded()`.
+
 ## 2.0.0
 
 ### Backwards incompatible:
 
-  - This release raises the minimum Elixir version to 1.4. This is due to GenEvent handlers for ExUni.Formatter being deprecated in Elixir 1.4.
+  - This release raises the minimum Elixir version to 1.4. This is due to GenEvent handlers for ExUnit.Formatter being deprecated in Elixir 1.4.
 
 ## v1.3.0
 

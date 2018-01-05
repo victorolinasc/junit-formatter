@@ -1,23 +1,28 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
-  @version "2.0.0"
+  @version "2.1.0"
 
   def project do
-    [app: :junit_formatter,
-     version: @version,
-     elixir: "~> 1.4",
-     deps: deps(),
-     package: package(),
-     consolidate_protocols: Mix.env != :test,
-     description: description(),
-     name: "JUnit Formatter",
-     test_coverage: [tool: ExCoveralls],
-     docs: [extras: ["README.md": [title: "Overview"],
-                     "CHANGELOG.md": [title: "Changelog"]],
-            main: "readme",
-            source_ref: "v#{@version}",
-            source_url: "https://github.com/victorolinasc/junit-formatter"]
+    [
+      app: :junit_formatter,
+      version: @version,
+      elixir: "~> 1.4",
+      deps: deps(),
+      package: package(),
+      consolidate_protocols: Mix.env() != :test,
+      description: description(),
+      name: "JUnit Formatter",
+      test_coverage: [tool: ExCoveralls],
+      docs: [
+        extras: [
+          "README.md": [title: "Overview"],
+          "CHANGELOG.md": [title: "Changelog"]
+        ],
+        main: "readme",
+        source_ref: "v#{@version}",
+        source_url: "https://github.com/victorolinasc/junit-formatter"
+      ]
     ]
   end
 
@@ -28,8 +33,8 @@ defmodule Formatter.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.2", only: :dev},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.7", only: :test},
+      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.8", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
       {:credo, "~> 0.8", only: [:dev, :test]}
     ]
@@ -40,8 +45,10 @@ defmodule Formatter.Mixfile do
       files: ["lib", "mix.exs", "README*", "LICENSE*", "CHANGELOG*"],
       maintainers: ["Victor Nascimento"],
       licenses: ["Apache 2.0"],
-      links: %{"Github" => "https://github.com/victorolinasc/junit-formatter",
-               "docs" => "http://hexdocs.pm/junit_formatter/"}
+      links: %{
+        "Github" => "https://github.com/victorolinasc/junit-formatter",
+        "docs" => "http://hexdocs.pm/junit_formatter/"
+      }
     ]
   end
 

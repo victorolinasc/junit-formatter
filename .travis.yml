@@ -3,16 +3,18 @@ sudo: false # to use faster container based build environment
 
 matrix:
   include:
-    - otp_release: 18.3
+    - otp_release: 19.3
       elixir: 1.4.5
-    - otp_release: 19.0
+    - otp_release: 20.2
       elixir: 1.4.5
-    - otp_release: 20.0
-      elixir: 1.4.5
-    - otp_release: 19.0
-      elixir: 1.5.1
-    - otp_release: 20.0
-      elixir: 1.5.1
+    - otp_release: 19.3
+      elixir: 1.5.3
+    - otp_release: 20.2
+      elixir: 1.5.3
+    - otp_release: 19.3
+      elixir: 1.6.0-rc.0
+    - otp_release: 20.2
+      elixir: 1.6.0-rc.0
 
 after_script:
   - mix deps.get
