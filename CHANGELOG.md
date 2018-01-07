@@ -2,8 +2,8 @@
 
 ### Bugfixes:
 
-  - Fixes subprocess crashes. When a subprocess crashes it sends a {:EXIT, pid} message that can't be parsed by Atom.to_string/1. Thanks to @dmt!
-  - Fixes running on Elixir 1.6.0-rc.0. `ExUnit.Server.cases_loaded()` got renamed to `ExUnit.Server.modules_loaded()`.
+  - Fixes subprocess crashes. When a subprocess crashes it sends a {:EXIT, pid} message that can't be parsed by Atom.to_string/1. Thanks to @dmt !
+  - Fixes running tests on Elixir 1.6.0-rc.0. `ExUnit.Server.cases_loaded()` got renamed to `ExUnit.Server.modules_loaded()`.
 
 ## 2.0.0
 
