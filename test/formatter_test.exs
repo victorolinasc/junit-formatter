@@ -141,6 +141,22 @@ defmodule FormatterTest do
              "<testcase classname=\"Elixir.FormatterTest.SkipTest\" name=\"test it just skips\" ><skipped/></testcase>"
   end
 
+
+  test "it can include unicode in test names" do
+    defmodule UnicodeTest do
+      use ExUnit.Case
+
+      test "make sure 3 ≤ 4" do
+        :ok
+      end
+    end
+
+    output = run_and_capture_output() |> strip_time_and_line_number
+
+    assert output =~
+             "<testcase classname=\"Elixir.FormatterTest.UnicodeTest\" name=\"test make sure 3 ≤ 4\" />"
+  end
+
   test "it can format time" do
     assert JUnitFormatter.format_time(1_000_000) == "1.0"
     assert JUnitFormatter.format_time(10000) == "0.01"

@@ -188,7 +188,7 @@ defmodule JUnitFormatter do
       :testcase,
       [
         classname: Atom.to_charlist(test.case),
-        name: Atom.to_charlist(test.name),
+        name: Atom.to_string(test.name),
         time: test.time |> us_to_ms |> format_ms
       ],
       generate_test_body(test)
