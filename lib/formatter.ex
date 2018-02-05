@@ -72,7 +72,7 @@ defmodule JUnitFormatter do
     # save the report in an xml file
     file_name = get_file_name(config)
     file = File.open!(file_name, [:write])
-    IO.binwrite(file, result)
+    IO.write(file, result)
     File.close(file)
 
     if Application.get_env(:junit_formatter, :print_report_file, false) do
