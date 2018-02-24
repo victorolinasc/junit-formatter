@@ -70,7 +70,7 @@ defmodule JUnitFormatter do
     result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
 
     # save the report in an xml file
-    file_name = get_file_name(config)
+    file_name = get_report_file_path()
     file = File.open!(file_name, [:write])
     IO.write(file, result)
     File.close(file)
@@ -130,9 +130,16 @@ defmodule JUnitFormatter do
   """
   @spec get_report_file_path() :: String.t()
   def get_report_file_path() do
+    prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
+
     report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
     report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
-    "#{report_dir}/#{report_file}"
+
+    if prepend do
+      "#{report_dir}/#{Mix.Project.config()[:app]}-#{report_file}"
+    else
+      "#{report_dir}/#{report_file}"
+    end
   end
 
   # PRIVATE ------------
@@ -142,18 +149,6 @@ defmodule JUnitFormatter do
     stats = %{stats | tests: stats.tests + 1}
     stats = %{stats | time: stats.time + test.time}
     %{stats | test_cases: [test | stats.test_cases]}
-  end
-
-  # Retrieves the report file name. It may use config in the future to customize this option.
-  defp get_file_name(_config) do
-    require Logger
-
-    report_path = get_report_file_path()
-    debug = Application.get_env(:junit_formatter, :print_report_file, false)
-
-    if debug, do: Logger.debug(fn -> "Junit-formatter report at: #{report_path}" end)
-
-    report_path
   end
 
   defp generate_testsuite_xml({name, %TestCaseStats{} = stats}) do
@@ -222,9 +217,10 @@ defmodule JUnitFormatter do
       end
 
     [
-      {:failure, [message: exception_kind <> ": " <> message], [
-        String.to_charlist(formatted_stack)
-      ]}
+      {:failure, [message: exception_kind <> ": " <> message],
+       [
+         String.to_charlist(formatted_stack)
+       ]}
     ]
   end
 

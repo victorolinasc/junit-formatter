@@ -1,3 +1,10 @@
+## 2.2.0
+
+### Bugfixes:
+
+  - Fix unicode characters in test names on OTP 20. It is important to notice that test names with unicode characters that are not ascii will **ONLY** work if running on OTP 20. Thanks to @sparta-developers
+  - Add option of prepending the project name to the report file to avoid overriding the results when in umbrella project. README was also updated. Thanks to @axelson for bringing the issue.
+
 ## 2.1.0
 
 ### Bugfixes:

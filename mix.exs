@@ -1,7 +1,7 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
-  @version "2.1.0"
+  @version "2.2.0"
 
   def project do
     [
@@ -36,7 +36,7 @@ defmodule Formatter.Mixfile do
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
-      {:credo, "~> 0.8", only: [:dev, :test]}
+      {:credo, "~> 0.9.0-rc6", only: [:dev, :test]}
     ]
   end
 

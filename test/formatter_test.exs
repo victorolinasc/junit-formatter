@@ -142,33 +142,32 @@ defmodule FormatterTest do
   end
 
   if System.otp_release() == "20" do
-  test "it can include unicode in test names" do
-    defmodule UnicodeTest do
-      use ExUnit.Case
+    test "it can include unicode in test names" do
+      defmodule UnicodeTest do
+        use ExUnit.Case
 
-      test "make sure 3 ≤ 4" do
-        :ok
+        test "make sure 3 ≤ 4" do
+          :ok
+        end
       end
-    end
 
-    output = run_and_capture_output() |> strip_time_and_line_number
+      output = run_and_capture_output() |> strip_time_and_line_number
 
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.UnicodeTest\" name=\"test make sure 3 ≤ 4\" />"
+      assert output =~
+               "<testcase classname=\"Elixir.FormatterTest.UnicodeTest\" name=\"test make sure 3 ≤ 4\" />"
     end
   end
 
   test "it can format time" do
     assert JUnitFormatter.format_time(1_000_000) == "1.0"
-    assert JUnitFormatter.format_time(10000) == "0.01"
-    assert JUnitFormatter.format_time(20000) == "0.02"
+    assert JUnitFormatter.format_time(10_000) == "0.01"
+    assert JUnitFormatter.format_time(20_000) == "0.02"
     assert JUnitFormatter.format_time(110_000) == "0.1"
     assert JUnitFormatter.format_time(1_100_000) == "1.1"
   end
 
   test "it can retrieve report file path" do
-    # default
-    assert get_config(:report_file) == "report_file_test.xml"
+    on_exit(&reset_config/0)
 
     assert JUnitFormatter.get_report_file_path() ==
              "#{Mix.Project.app_path()}/report_file_test.xml"
@@ -180,7 +179,25 @@ defmodule FormatterTest do
     assert JUnitFormatter.get_report_file_path() == "/tmp/abc.xml"
   end
 
+  test "it can prepend the project name to the report file" do
+    on_exit(&reset_config/0)
+
+    # Ensure defaults
+    put_config(:prepend_project_name?, true)
+
+    assert get_config(:report_file) == "report_file_test.xml"
+
+    assert JUnitFormatter.get_report_file_path() ==
+             "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
+  end
+
   # Utilities --------------------
+  defp reset_config do
+    put_config(:report_file, "report_file_test.xml")
+    put_config(:report_dir, Mix.Project.app_path())
+    put_config(:prepend_project_name?, false)
+  end
+
   defp get_config(name), do: Application.get_env(:junit_formatter, name)
   defp put_config(name, value), do: Application.put_env(:junit_formatter, name, value)
 
