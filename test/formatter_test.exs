@@ -141,7 +141,7 @@ defmodule FormatterTest do
              "<testcase classname=\"Elixir.FormatterTest.SkipTest\" name=\"test it just skips\" ><skipped/></testcase>"
   end
 
-
+  if System.otp_release() == "20" do
   test "it can include unicode in test names" do
     defmodule UnicodeTest do
       use ExUnit.Case
@@ -155,6 +155,7 @@ defmodule FormatterTest do
 
     assert output =~
              "<testcase classname=\"Elixir.FormatterTest.UnicodeTest\" name=\"test make sure 3 ≤ 4\" />"
+    end
   end
 
   test "it can format time" do
