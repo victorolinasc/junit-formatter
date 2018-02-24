@@ -72,7 +72,7 @@ defmodule JUnitFormatter do
     # save the report in an xml file
     file_name = get_file_name(config)
     file = File.open!(file_name, [:write])
-    IO.binwrite(file, result)
+    IO.write(file, result)
     File.close(file)
 
     if Application.get_env(:junit_formatter, :print_report_file, false) do
@@ -188,7 +188,7 @@ defmodule JUnitFormatter do
       :testcase,
       [
         classname: Atom.to_charlist(test.case),
-        name: Atom.to_charlist(test.name),
+        name: Atom.to_string(test.name),
         time: test.time |> us_to_ms |> format_ms
       ],
       generate_test_body(test)
