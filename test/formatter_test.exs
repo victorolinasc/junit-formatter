@@ -47,7 +47,7 @@ defmodule FormatterTest do
              "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test the truth\" />"
 
     assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failure message=\"error: Assertion with == failed\ncode:  assert 1 + 1 == 3\nleft:  2\nright: 3\n\">    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failure></testcase>"
+             "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failure message=\"Assertion with == failed\ncode:  assert 1 + 1 == 3\nleft:  2\nright: 3\n\">Assertion with == failed\ncode:  assert 1 + 1 == 3\nleft:  2\nright: 3\n\nStacktrace:\n\n    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failure></testcase>"
 
     # assert it contains correct suite
     assert output =~
@@ -69,7 +69,7 @@ defmodule FormatterTest do
              "<testsuite errors=\"0\" failures=\"1\" name=\"Elixir.FormatterTest.RaiseAsFailureTest\" tests=\"1\""
 
     assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failure message=\"error: argument error\">    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
+             "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failure message=\"error: argument error\">error: argument error\nStacktrace:\n\n    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
   end
 
   test "it can handle empty reason" do
@@ -84,7 +84,7 @@ defmodule FormatterTest do
     output = run_and_capture_output() |> strip_time_and_line_number
 
     assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
+             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">throw: nil\nStacktrace:\n\n    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
   end
 
   @tag :capture_log
@@ -103,7 +103,7 @@ defmodule FormatterTest do
     output = run_and_capture_output() |> strip_time_and_line_number
 
     assert output =~
-             ~r/<testcase classname=\"Elixir.FormatterTest.RaiseCrash\" name=\"test it crashes\" ><failure message=\"{:EXIT, #PID&lt;0.\d+.0>}: {%ArgumentError{message: &quot;argument error&quot;}, .*?\">\n<\/failure><\/testcase>/
+             ~r/<testcase classname="Elixir.FormatterTest.RaiseCrash" name="test it crashes" ><failure message="{:EXIT, #PID&lt;0.\d+.0>}: {%ArgumentError{message: &quot;argument error&quot;}, [^>]*?\">[^<]*<\/failure><\/testcase>/
   end
 
   test "it can handle empty message" do
@@ -122,7 +122,7 @@ defmodule FormatterTest do
     output = run_and_capture_output() |> strip_time_and_line_number()
 
     assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: got nil while retrieving Exception.message/1 for %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil} (expected a string)\">    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
+             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: got nil while retrieving Exception.message/1 for %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil} (expected a string)\">error: got nil while retrieving Exception.message/1 for %FormatterTest.NilMessageError{customMessage: \"A custom error occured !\", message: nil} (expected a string)\nStacktrace:\n\n    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
   end
 
   test "it can count skipped tests" do

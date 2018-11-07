@@ -192,32 +192,41 @@ defmodule JUnitFormatter do
 
   defp generate_test_body(%ExUnit.Test{state: nil}), do: []
 
-  defp generate_test_body(%ExUnit.Test{state: {:skip, _}}) do
-    [{:skipped, [], []}]
+  defp generate_test_body(%ExUnit.Test{state: {atom, message}}) when atom in ~w[skipped excluded]a do
+    [{:skipped, [message: message], []}]
   end
 
-  defp generate_test_body(%ExUnit.Test{state: {:failed, [{kind, reason, stacktrace} | _]}}) do
-    generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}})
+  defp generate_test_body(%ExUnit.Test{state: {:failed, failures}} = test) do
+    Enum.map(List.wrap(failures), &format_failure(&1, test))
   end
 
-  defp generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}} = test) do
-    formatted_stack = Exception.format_stacktrace(stacktrace)
+  defp generate_test_body(%ExUnit.Test{state: {:invalid, module}}) do
+    [{:error, [message: "Invalid module #{inspect(module)}"], []}]
+  end
+
+  defp format_failure({:error, %ExUnit.AssertionError{} = reason, stack}, test) do
+    formatted_stack = Exception.format_stacktrace(stack)
 
     message =
-      case reason do
-        %ExUnit.AssertionError{} ->
-          ExUnit.Formatter.format_assertion_error(
-            test,
-            reason,
-            stacktrace,
-            :infinity,
-            fn _, msg -> msg end,
-            ""
-          )
+      ExUnit.Formatter.format_assertion_error(
+        test,
+        reason,
+        stack,
+        :infinity,
+        fn _, msg -> msg end,
+        ""
+      )
 
-        other ->
-          if Exception.exception?(other), do: Exception.message(other), else: inspect(other)
-      end
+    {:failure, [message: message],
+     [
+       String.to_charlist(message),
+       '\nStacktrace:\n\n',
+       String.to_charlist(formatted_stack)
+     ]}
+  end
+
+  defp format_failure({kind, reason, stack}, _test) do
+    formatted_stack = Exception.format_stacktrace(stack)
 
     exception_kind =
       case kind do
@@ -225,17 +234,13 @@ defmodule JUnitFormatter do
         other -> inspect(other)
       end
 
-    [
-      {:failure, [message: exception_kind <> ": " <> message],
-       [
-         String.to_charlist(message),
-         '\nStacktrace:\n\n',
-         String.to_charlist(formatted_stack)
-       ]}
-    ]
-  end
+    message = if Exception.exception?(reason), do: Exception.message(reason), else: inspect(reason)
 
-  defp generate_test_body(%ExUnit.Test{state: {:invalid, module}}) do
-    [{:error, [message: "Invalid module #{inspect(module)}"], []}]
+    {:failure, [message: exception_kind <> ": " <> message],
+     [
+       String.to_charlist(exception_kind <> ": " <> message),
+       '\nStacktrace:\n\n',
+       String.to_charlist(formatted_stack)
+     ]}
   end
 end
