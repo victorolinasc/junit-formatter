@@ -47,7 +47,7 @@ defmodule FormatterTest do
              "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test the truth\" />"
 
     assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failure message=\"error: Assertion with == failed\">    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failure></testcase>"
+             "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failure message=\"error: Assertion with == failed\ncode:  assert 1 + 1 == 3\nleft:  2\nright: 3\n\">    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failure></testcase>"
 
     # assert it contains correct suite
     assert output =~
@@ -122,7 +122,7 @@ defmodule FormatterTest do
     output = run_and_capture_output() |> strip_time_and_line_number()
 
     assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil}\">    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
+             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: got nil while retrieving Exception.message/1 for %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil} (expected a string)\">    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
   end
 
   test "it can count skipped tests" do

@@ -200,14 +200,14 @@ defmodule JUnitFormatter do
     generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}})
   end
 
-  defp generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}}) do
+  defp generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}} = test) do
     formatted_stack = Exception.format_stacktrace(stacktrace)
 
     message =
       case reason do
-        %{message: nil} -> inspect(reason)
-        %{message: message} -> message
-        other -> inspect(other)
+        %ExUnit.AssertionError{} ->
+          ExUnit.Formatter.format_assertion_error(test, reason, stacktrace, :infinity, fn _, msg -> msg end, "")
+        other -> if Exception.exception?(other), do: Exception.message(other), else: inspect(other)
       end
 
     exception_kind =
