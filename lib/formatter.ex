@@ -228,6 +228,8 @@ defmodule JUnitFormatter do
     [
       {:failure, [message: exception_kind <> ": " <> message],
        [
+         String.to_charlist(message),
+         '\nStacktrace:\n\n',
          String.to_charlist(formatted_stack)
        ]}
     ]
