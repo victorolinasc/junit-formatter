@@ -206,8 +206,17 @@ defmodule JUnitFormatter do
     message =
       case reason do
         %ExUnit.AssertionError{} ->
-          ExUnit.Formatter.format_assertion_error(test, reason, stacktrace, :infinity, fn _, msg -> msg end, "")
-        other -> if Exception.exception?(other), do: Exception.message(other), else: inspect(other)
+          ExUnit.Formatter.format_assertion_error(
+            test,
+            reason,
+            stacktrace,
+            :infinity,
+            fn _, msg -> msg end,
+            ""
+          )
+
+        other ->
+          if Exception.exception?(other), do: Exception.message(other), else: inspect(other)
       end
 
     exception_kind =
