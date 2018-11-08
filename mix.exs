@@ -36,7 +36,8 @@ defmodule Formatter.Mixfile do
       {:ex_doc, "~> 0.18", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
-      {:credo, "~> 0.9.0-rc6", only: [:dev, :test]}
+      {:credo, "~> 0.9.0-rc6", only: [:dev, :test]},
+      {:sweet_xml, "~> 0.6", only: :test}
     ]
   end
 
