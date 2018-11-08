@@ -201,7 +201,7 @@ defmodule JUnitFormatter do
   defp generate_test_body(%ExUnit.Test{state: nil}, _idx), do: []
 
   defp generate_test_body(%ExUnit.Test{state: {atom, message}}, _idx)
-       when atom in ~w[skipped excluded]a do
+       when atom in ~w[skip excluded]a do
     [{:skipped, [message: message], []}]
   end
 
@@ -214,8 +214,8 @@ defmodule JUnitFormatter do
     [{:failure, [message: message(failures)], [body]}]
   end
 
-  defp generate_test_body(%ExUnit.Test{state: {:invalid, module}}, _idx),
-    do: [{:error, [message: "Invalid module #{inspect(module)}"], []}]
+  defp generate_test_body(%ExUnit.Test{state: {:invalid, %name{} = module}}, _idx),
+    do: [{:error, [message: "Invalid module #{name}"], ['#{inspect(module)}']}]
 
   defp message([msg | _]), do: message(msg)
   defp message({_, %ExUnit.AssertionError{message: reason}, _}), do: reason
