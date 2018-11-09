@@ -25,18 +25,10 @@ defmodule JUnitFormatter do
   The report is written to a file in the _build directory.
   """
   require Record
+
   use GenServer
 
-  # Needed to use :xmerl
-  Record.defrecord(:xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
-  Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
-
-  Record.defrecord(
-    :xmlAttribute,
-    Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
-  )
-
-  defmodule TestCaseStats do
+  defmodule Stats do
     @moduledoc """
     A struct to keep track of test values and tests themselves.
 
@@ -59,68 +51,73 @@ defmodule JUnitFormatter do
           }
   end
 
+  defstruct cases: %{}, properties: %{}
+
   ## Formatter callbacks: may use opts in the future to configure file name pattern
 
-  def init(_opts), do: {:ok, []}
+  def init(opts) do
+    {:ok,
+     %__MODULE__{
+       properties: %{
+         seed: opts[:seed],
+         date: DateTime.to_iso8601(DateTime.utc_now())
+       }
+     }}
+  end
 
   def handle_cast({:suite_finished, _run_us, _load_us}, config) do
     # do the real magic
-    suites = Enum.map(config, &generate_testsuite_xml/1)
+    suites = Enum.map(config.cases, &generate_testsuite_xml(&1, config.properties))
     # wrap result in a root node (not adding any attribute to root)
     result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
 
     # save the report in an xml file
     file_name = get_report_file_path()
-    file = File.open!(file_name, [:write])
-    IO.write(file, result)
-    File.close(file)
+
+    :ok = File.write!(file_name, result, [:write])
 
     if Application.get_env(:junit_formatter, :print_report_file, false) do
-      require Logger
-      Logger.debug(fn -> "Wrote JUnit report to: #{file_name}" end)
+      IO.puts(:stderr, "Wrote JUnit report to: #{file_name}")
     end
 
     {:noreply, config}
   end
 
   def handle_cast({:test_finished, %ExUnit.Test{state: nil} = test}, config) do
-    stats = adjust_case_stats(test, config)
-    config = Keyword.put(config, test.case, stats)
+    config = adjust_case_stats(test, nil, config)
 
     {:noreply, config}
   end
 
   def handle_cast({:test_finished, %ExUnit.Test{state: {:skip, _}} = test}, config) do
-    stats = adjust_case_stats(test, config)
-    stats = %{stats | skipped: stats.skipped + 1}
-    config = Keyword.put(config, test.case, stats)
+    config = adjust_case_stats(test, :skipped, config)
+
+    {:noreply, config}
+  end
+
+  def handle_cast({:test_finished, %ExUnit.Test{state: {:excluded, _}} = test}, config) do
+    config = adjust_case_stats(test, :skipped, config)
 
     {:noreply, config}
   end
 
   def handle_cast({:test_finished, %ExUnit.Test{state: {:failed, _failed}} = test}, config) do
-    stats = adjust_case_stats(test, config)
-    stats = %{stats | failures: stats.failures + 1}
-    config = Keyword.put(config, test.case, stats)
+    config = adjust_case_stats(test, :failures, config)
 
     {:noreply, config}
   end
 
   def handle_cast({:test_finished, %ExUnit.Test{state: {:invalid, _module}} = test}, config) do
-    stats = adjust_case_stats(test, config)
-    stats = %{stats | errors: stats.errors + 1}
-    config = Keyword.put(config, test.case, stats)
+    config = adjust_case_stats(test, :errors, config)
 
     {:noreply, config}
   end
 
-  def handle_cast(_event, config) do
-    {:noreply, config}
-  end
+  def handle_cast(_event, config), do: {:noreply, config}
 
   @doc "Formats time from nanos to seconds"
-  @spec format_time(integer) :: integer
-  def format_time(time), do: time |> us_to_ms |> format_ms
+  @spec format_time(integer) :: binary
+  def format_time(time), do: :io_lib.format('~.4f', [time / 1_000_000]) |> List.to_string()
 
   @doc """
   Helper function to get the full path of the generated report file.
@@ -129,29 +126,46 @@ defmodule JUnitFormatter do
   - report_file: name of the generated file (defaults to "test-junit-report.xml")
   """
   @spec get_report_file_path() :: String.t()
-  def get_report_file_path() do
+  def get_report_file_path do
     prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
 
     report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
     report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
+    prefix = if prepend, do: "#{Mix.Project.config()[:app]}-", else: ""
 
-    if prepend do
-      "#{report_dir}/#{Mix.Project.config()[:app]}-#{report_file}"
-    else
-      "#{report_dir}/#{report_file}"
-    end
+    Path.join(report_dir, prefix <> report_file)
   end
 
   # PRIVATE ------------
 
-  defp adjust_case_stats(%ExUnit.Test{} = test, config) do
-    stats = Keyword.get(config, test.case, %JUnitFormatter.TestCaseStats{})
-    stats = %{stats | tests: stats.tests + 1}
-    stats = %{stats | time: stats.time + test.time}
-    %{stats | test_cases: [test | stats.test_cases]}
+  defp adjust_case_stats(%ExUnit.Test{case: name, time: time} = test, type, state) do
+    cases =
+      Map.update(state.cases, name, struct(Stats, [{type, 1}, test_cases: [test], time: time, tests: 1]), fn stats ->
+        stats =
+          struct(
+            stats,
+            test_cases: [test | stats.test_cases],
+            time: stats.time + time,
+            tests: stats.tests + 1
+          )
+
+        if type, do: Map.update!(stats, type, &(&1 + 1)), else: stats
+      end)
+
+    %{state | cases: cases}
   end
 
-  defp generate_testsuite_xml({name, %TestCaseStats{} = stats}) do
+  defp generate_testsuite_xml({name, %Stats{} = stats}, properties) do
+    properties =
+      for {name, value} <- properties do
+        {:property, [name: name, value: value], []}
+      end
+
+    cases =
+      for {test, idx} <- Enum.with_index(stats.test_cases, 1) do
+        generate_testcases(test, idx)
+      end
+
     {
       :testsuite,
       [
@@ -159,72 +173,46 @@ defmodule JUnitFormatter do
         failures: stats.failures,
         name: name,
         tests: stats.tests,
-        time: stats.time |> format_time()
+        time: format_time(stats.time)
       ],
-      for test <- stats.test_cases do
-        generate_testcases(test)
-      end
+      [{:properties, [], properties} | cases]
     }
   end
 
-  defp us_to_ms(us), do: div(us, 10_000)
-
-  defp format_ms(ms) do
-    if ms < 10 do
-      "0.0#{ms}"
-    else
-      ms = div(ms, 10)
-      "#{div(ms, 10)}.#{rem(ms, 10)}"
-    end
-  end
-
-  defp generate_testcases(test) do
+  defp generate_testcases(test, idx) do
     {
       :testcase,
       [
-        classname: Atom.to_charlist(test.case),
+        classname: Atom.to_string(test.case),
         name: Atom.to_string(test.name),
-        time: test.time |> us_to_ms |> format_ms
+        time: format_time(test.time)
       ],
-      generate_test_body(test)
+      generate_test_body(test, idx)
     }
   end
 
-  defp generate_test_body(%ExUnit.Test{state: nil}), do: []
+  defp generate_test_body(%ExUnit.Test{state: nil}, _idx), do: []
 
-  defp generate_test_body(%ExUnit.Test{state: {:skip, _}}) do
-    [{:skipped, [], []}]
+  defp generate_test_body(%ExUnit.Test{state: {atom, message}}, _idx)
+       when atom in ~w[skip excluded]a do
+    [{:skipped, [message: message], []}]
   end
 
-  defp generate_test_body(%ExUnit.Test{state: {:failed, [{kind, reason, stacktrace} | _]}}) do
-    generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}})
+  defp generate_test_body(%ExUnit.Test{state: {:failed, failures}} = test, idx) do
+    body =
+      test
+      |> ExUnit.Formatter.format_test_failure(failures, idx, :infinity, fn _, msg -> msg end)
+      |> String.to_charlist()
+
+    [{:failure, [message: message(failures)], [body]}]
   end
 
-  defp generate_test_body(%ExUnit.Test{state: {:failed, {kind, reason, stacktrace}}}) do
-    formatted_stack = Exception.format_stacktrace(stacktrace)
+  defp generate_test_body(%ExUnit.Test{state: {:invalid, %name{} = module}}, _idx),
+    do: [{:error, [message: "Invalid module #{name}"], ['#{inspect(module)}']}]
 
-    message =
-      case reason do
-        %{message: nil} -> inspect(reason)
-        %{message: message} -> message
-        other -> inspect(other)
-      end
-
-    exception_kind =
-      case kind do
-        error when is_atom(error) -> Atom.to_string(error)
-        other -> inspect(other)
-      end
-
-    [
-      {:failure, [message: exception_kind <> ": " <> message],
-       [
-         String.to_charlist(formatted_stack)
-       ]}
-    ]
-  end
-
-  defp generate_test_body(%ExUnit.Test{state: {:invalid, module}}) do
-    [{:error, [message: "Invalid module #{inspect(module)}"], []}]
-  end
+  defp message([msg | _]), do: message(msg)
+  defp message({_, %ExUnit.AssertionError{message: reason}, _}), do: reason
+  defp message({:error, reason, _}), do: "error: #{Exception.message(reason)}"
+  defp message({type, reason, _}) when is_atom(type), do: "#{type}: #{inspect(reason)}"
+  defp message({type, reason, _}), do: "#{inspect(type)}: #{inspect(reason)}"
 end

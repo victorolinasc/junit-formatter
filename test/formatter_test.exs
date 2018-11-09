@@ -1,194 +1,275 @@
 defmodule FormatterTest do
   use ExUnit.Case, async: false
 
-  test "that a valid test generates a proper report" do
-    defmodule ValidTest do
-      use ExUnit.Case
+  import SweetXml
 
-      test "the truth" do
-        assert 1 + 1 == 2
-      end
-    end
+  defmacrop defsuite(do: block) do
+    quote do
+      {:module, name, _, _} =
+        defmodule unquote(Module.concat(__MODULE__, :"Test#{System.unique_integer([:positive])}")) do
+          use ExUnit.Case
 
-    output = run_and_capture_output() |> strip_time_and_line_number
-    assert output =~ read_fixture("valid_test.xml")
-  end
-
-  test "that an invalid test generates a proper report" do
-    defmodule FailureTest do
-      use ExUnit.Case
-
-      test "it will fail" do
-        assert 1 + 1 == 3
-      end
-    end
-
-    output = run_and_capture_output() |> strip_time_and_line_number
-    assert output =~ read_fixture("invalid_test.xml")
-  end
-
-  test "valid and invalid tests generates a proper report" do
-    defmodule ValidAndInvalidTest do
-      use ExUnit.Case
-
-      test "the truth" do
-        assert 1 + 1 == 2
-      end
-
-      test "it will fail" do
-        assert 1 + 1 == 3
-      end
-    end
-
-    output = run_and_capture_output() |> strip_time_and_line_number
-
-    # can't ensure order. Assert it contains both cases
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test the truth\" />"
-
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.ValidAndInvalidTest\" name=\"test it will fail\" ><failure message=\"error: Assertion with == failed\">    test/formatter_test.exs FormatterTest.ValidAndInvalidTest.\"test it will fail\"/1\n</failure></testcase>"
-
-    # assert it contains correct suite
-    assert output =~
-             "<testsuite errors=\"0\" failures=\"1\" name=\"Elixir.FormatterTest.ValidAndInvalidTest\" tests=\"2\" >"
-  end
-
-  test "it counts raises as failures" do
-    defmodule RaiseAsFailureTest do
-      use ExUnit.Case
-
-      test "it counts raises" do
-        raise ArgumentError
-      end
-    end
-
-    output = run_and_capture_output() |> strip_time_and_line_number
-
-    assert output =~
-             "<testsuite errors=\"0\" failures=\"1\" name=\"Elixir.FormatterTest.RaiseAsFailureTest\" tests=\"1\""
-
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseAsFailureTest\" name=\"test it counts raises\" ><failure message=\"error: argument error\">    test/formatter_test.exs FormatterTest.RaiseAsFailureTest.\"test it counts raises\"/1"
-  end
-
-  test "it can handle empty reason" do
-    defmodule RaiseWithNoReason do
-      use ExUnit.Case
-
-      test "it raises without reason" do
-        throw(nil)
-      end
-    end
-
-    output = run_and_capture_output() |> strip_time_and_line_number
-
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoReason\" name=\"test it raises without reason\" ><failure message=\"throw: nil\">    test/formatter_test.exs FormatterTest.RaiseWithNoReason.\"test it raises without reason\"/1\n</failure></testcase>"
-  end
-
-  @tag :capture_log
-  test "it can handle crashed process" do
-    defmodule RaiseCrash do
-      use ExUnit.Case
-
-      test "it crashes" do
-        spawn_link(fn -> raise ArgumentError end)
-
-        receive do
+          unquote(block)
         end
+
+      name
+    end
+  end
+
+  describe "properties" do
+    test "contains seed" do
+      defsuite do
+        test "it will fail", do: assert false
+      end
+
+      output = run_and_capture_output(seed: 0)
+
+      assert '0' ==
+               xpath(output, ~x{/testsuites/testsuite/properties/property[@name="seed"]/@value})
+    end
+
+    test "contains date" do
+      defsuite do
+        test "it will fail", do: assert false
+      end
+
+      output = run_and_capture_output(seed: 0)
+
+      assert_xpath(output, ~x{/testsuites/testsuite/properties/property[@name="date"]})
+    end
+  end
+
+  describe "testsuites" do
+    test "tag is present as a root" do
+      defsuite do
+        test "it will fail", do: assert false
+      end
+
+      output = run_and_capture_output()
+
+      assert_xpath(output, ~x{/testsuites})
+    end
+  end
+
+  describe "testsuite" do
+    test "direct descendant of testsuites" do
+      defsuite do
+        test "it will fail", do: assert(false)
+      end
+
+      output = run_and_capture_output()
+
+      assert_xpath(output, ~x{/testsuites/testsuite})
+    end
+
+    for attr <- ~w[tests errors failures] do
+      test "has attribute #{attr}" do
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
+
+        output = run_and_capture_output()
+
+        assert output |> xpath(~x{//testsuite/@#{unquote(attr)}}) |> List.to_integer()
       end
     end
 
-    output = run_and_capture_output() |> strip_time_and_line_number
+    test "suite name matches the module atom" do
+      name =
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
 
-    assert output =~
-             ~r/<testcase classname=\"Elixir.FormatterTest.RaiseCrash\" name=\"test it crashes\" ><failure message=\"{:EXIT, #PID&lt;0.\d+.0>}: {%ArgumentError{message: &quot;argument error&quot;}, .*?\">\n<\/failure><\/testcase>/
-  end
+      output = run_and_capture_output()
 
-  test "it can handle empty message" do
-    defmodule NilMessageError do
-      defexception message: nil, customMessage: "A custom error occured !"
+      assert Atom.to_charlist(name) == xpath(output, ~x{//testsuite/@name})
     end
 
-    defmodule RaiseWithNoMessage do
-      use ExUnit.Case
+    test "counts matches expected" do
+      defsuite do
+        test "pass", do: assert(true)
 
-      test "it raises without message" do
-        raise NilMessageError
+        test "fail", do: assert(false)
       end
+
+      output = run_and_capture_output()
+
+      # assert it contains correct suite
+      assert %{errors: '0', failures: '1', tests: '2'} =
+               xpath(output, ~x"//testsuite",
+                 errors: ~x"./@errors",
+                 failures: ~x"./@failures",
+                 tests: ~x"./@tests"
+               )
     end
 
-    output = run_and_capture_output() |> strip_time_and_line_number()
-
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.RaiseWithNoMessage\" name=\"test it raises without message\" ><failure message=\"error: %FormatterTest.NilMessageError{customMessage: &quot;A custom error occured !&quot;, message: nil}\">    test/formatter_test.exs FormatterTest.RaiseWithNoMessage.\"test it raises without message\"/1\n</failure></testcase>"
-  end
-
-  test "it can count skipped tests" do
-    defmodule SkipTest do
-      use ExUnit.Case
-
-      @tag :skip
-      test "it just skips" do
-        :ok
+    test "have time attribute" do
+      defsuite do
+        test "it will fail", do: assert(false)
       end
+
+      output = run_and_capture_output()
+
+      assert output |> xpath(~x{//testsuite/@time}) |> List.to_float()
     end
-
-    output = run_and_capture_output() |> strip_time_and_line_number()
-
-    assert output =~
-             "<testcase classname=\"Elixir.FormatterTest.SkipTest\" name=\"test it just skips\" ><skipped/></testcase>"
   end
 
-  if System.otp_release() == "20" do
-    test "it can include unicode in test names" do
-      defmodule UnicodeTest do
+  describe "failure" do
+    test "contains proper message" do
+      defsuite do
+        test "fails", do: assert false
+      end
+
+      output = run_and_capture_output()
+
+      assert_xpath(
+        output,
+        ~x{//testcase[@name="test fails"]/failure[@message="Expected truthy, got false"]}
+      )
+    end
+    test "it counts raises as failures" do
+      defsuite do
+        test "raise", do: raise(ArgumentError)
+      end
+
+      output = run_and_capture_output()
+
+      assert %{failures: '1'} = xpath(output, ~x"//testsuite", failures: ~x"./@failures")
+
+      assert_xpath(
+        output,
+        ~x{//testcase[@name="test raise"]/failure[@message="error: argument error"]}
+      )
+    end
+
+    test "it can handle empty reason" do
+      defmodule RaiseWithNoReason do
         use ExUnit.Case
 
-        test "make sure 3 ≤ 4" do
-          :ok
+        test "throw", do: throw(nil)
+      end
+
+      output = run_and_capture_output()
+
+      assert_xpath(
+        output,
+        ~x{//testcase[@name="test throw"]/failure[@message="throw: nil"]}
+      )
+    end
+
+    @tag :capture_log
+    test "it can handle crashed process" do
+      defsuite do
+        test "linked process raise" do
+          spawn_link(fn -> raise ArgumentError end)
+
+          assert_receive :ok
         end
       end
 
-      output = run_and_capture_output() |> strip_time_and_line_number
+      output = run_and_capture_output()
 
-      assert output =~
-               "<testcase classname=\"Elixir.FormatterTest.UnicodeTest\" name=\"test make sure 3 ≤ 4\" />"
+      assert_xpath(output, ~x{//testcase[@name="test linked process raise"]/failure})
+    end
+
+    test "it can handle empty message" do
+      defmodule NilMessageError do
+        defexception message: nil, customMessage: "A custom error occured !"
+      end
+
+      defsuite do
+        test "raises without message", do: raise(NilMessageError)
+      end
+
+      output = run_and_capture_output()
+
+      assert_xpath(output, ~x{//testcase[@name="test raises without message"]/failure})
     end
   end
 
-  test "it can format time" do
-    assert JUnitFormatter.format_time(1_000_000) == "1.0"
-    assert JUnitFormatter.format_time(10_000) == "0.01"
-    assert JUnitFormatter.format_time(20_000) == "0.02"
-    assert JUnitFormatter.format_time(110_000) == "0.1"
-    assert JUnitFormatter.format_time(1_100_000) == "1.1"
+  describe "skipped" do
+    test "have skipped child" do
+      defsuite do
+        @tag :foo
+        test "skip", do: assert(true)
+
+        test "don't skip", do: assert(true)
+      end
+
+      output = run_and_capture_output(exclude: [:foo])
+
+      assert_xpath(output, ~x{//testcase[@name="test skip"]/skipped})
+      refute xpath(output, ~x{//testcase[@name="test don't skip"]/skipped})
+    end
   end
 
-  test "it can retrieve report file path" do
-    on_exit(&reset_config/0)
+  describe "error" do
+    test "when `setup_all` fails" do
+      defsuite do
+        setup_all do: raise("Foo")
 
-    assert JUnitFormatter.get_report_file_path() ==
-             "#{Mix.Project.app_path()}/report_file_test.xml"
+        test "errored", do: assert(true)
+      end
 
-    put_config(:report_file, "abc.xml")
-    assert JUnitFormatter.get_report_file_path() == "#{Mix.Project.app_path()}/abc.xml"
+      output = run_and_capture_output()
 
-    put_config(:report_dir, "/tmp")
-    assert JUnitFormatter.get_report_file_path() == "/tmp/abc.xml"
+      assert_xpath(output, ~x{//testcase[@name="test errored"]/error})
+    end
   end
 
-  test "it can prepend the project name to the report file" do
-    on_exit(&reset_config/0)
+  describe "testcase" do
+    if System.otp_release() >= "20" do
+      test "it can include unicode in test names" do
+        defsuite do
+          test "make sure 3 ≤ 4" do
+            :ok
+          end
+        end
 
-    # Ensure defaults
-    put_config(:prepend_project_name?, true)
+        output = run_and_capture_output()
 
-    assert get_config(:report_file) == "report_file_test.xml"
+        assert_xpath(output, ~x{//testcase[@name="test make sure 3 ≤ 4"]})
+      end
+    end
+  end
 
-    assert JUnitFormatter.get_report_file_path() ==
-             "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
+  describe "format_time/1" do
+    test "it can format time" do
+      assert JUnitFormatter.format_time(1_000_000) == "1.0000"
+      assert JUnitFormatter.format_time(10_000) == "0.0100"
+      assert JUnitFormatter.format_time(20_000) == "0.0200"
+      assert JUnitFormatter.format_time(110_000) == "0.1100"
+      assert JUnitFormatter.format_time(1_100_000) == "1.1000"
+    end
+  end
+
+  describe "configuration" do
+    setup do
+      on_exit(&reset_config/0)
+
+      :ok
+    end
+
+    test "it can retrieve report file path" do
+      assert JUnitFormatter.get_report_file_path() ==
+               "#{Mix.Project.app_path()}/report_file_test.xml"
+
+      put_config(:report_file, "abc.xml")
+      assert JUnitFormatter.get_report_file_path() == "#{Mix.Project.app_path()}/abc.xml"
+
+      put_config(:report_dir, "/tmp")
+      assert JUnitFormatter.get_report_file_path() == "/tmp/abc.xml"
+    end
+
+    test "it can prepend the project name to the report file" do
+      # Ensure defaults
+      put_config(:prepend_project_name?, true)
+
+      assert get_config(:report_file) == "report_file_test.xml"
+
+      assert JUnitFormatter.get_report_file_path() ==
+               "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
+    end
   end
 
   # Utilities --------------------
@@ -201,12 +282,8 @@ defmodule FormatterTest do
   defp get_config(name), do: Application.get_env(:junit_formatter, name)
   defp put_config(name, value), do: Application.put_env(:junit_formatter, name, value)
 
-  defp read_fixture(extra) do
-    Path.expand("fixtures", __DIR__) |> Path.join(extra) |> File.read!()
-  end
-
-  defp run_and_capture_output do
-    ExUnit.configure(formatters: [JUnitFormatter], exclude: :skip)
+  defp run_and_capture_output(opts \\ []) do
+    ExUnit.configure(Keyword.merge(opts, formatters: [JUnitFormatter]))
 
     funs = ExUnit.Server.__info__(:functions)
 
@@ -220,9 +297,7 @@ defmodule FormatterTest do
     File.read!(JUnitFormatter.get_report_file_path()) <> "\n"
   end
 
-  defp strip_time_and_line_number(output) do
-    output = String.replace(output, ~r/time=\"[0-9]+\.[0-9]+\"/, "")
-    file = List.last(String.split(__ENV__.file, ~r/\//))
-    String.replace(output, ~r/#{file}:[0-9]+:/, file)
+  defp assert_xpath(xml, xpath) do
+    assert xpath(xml, xpath), "Path #{inspect(xpath.path)} do not match #{inspect(xml)}"
   end
 end
