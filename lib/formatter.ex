@@ -85,7 +85,9 @@ defmodule JUnitFormatter do
 
     :ok = File.write!(file_name, result, [:write])
 
-    IO.puts(:stderr, "Wrote JUnit report to: #{file_name}")
+    if Application.get_env(:junit_formatter, :print_report_file, false) do
+      IO.puts(:stderr, "Wrote JUnit report to: #{file_name}")
+    end
 
     {:noreply, config}
   end
