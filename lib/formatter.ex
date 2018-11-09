@@ -28,15 +28,6 @@ defmodule JUnitFormatter do
 
   use GenServer
 
-  # Needed to use :xmerl
-  Record.defrecord(:xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
-  Record.defrecord(:xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
-
-  Record.defrecord(
-    :xmlAttribute,
-    Record.extract(:xmlAttribute, from_lib: "xmerl/include/xmerl.hrl")
-  )
-
   defmodule Stats do
     @moduledoc """
     A struct to keep track of test values and tests themselves.
