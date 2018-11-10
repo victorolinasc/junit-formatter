@@ -7,9 +7,7 @@ A simple ExUnit Formatter that collects test results and generates an xml report
 
 The report is generated in `Mix.Project.app_path` folder with a default filename of test-junit-report.xml. It can be configured through application configuration on the key report_file (application junit_formatter).
 
-## OBSERVATION
-
-Versions 2+ require minimum Elixir version to be 1.4+. For older releases, please use version 1.3 of this library.
+> Versions 3+ require minimum Elixir version to be 1.5+. For older releases, please use version 2.2 of this library.
 
 ## Usage
 
@@ -18,7 +16,7 @@ First, add `JUnitFormatter` to the dependencies in your mix.exs:
 ```elixir
   defp deps do
     [
-      {:junit_formatter, "~> 2.2", only: [:test]}
+      {:junit_formatter, "~> 3.0", only: [:test]}
     ]
   end
 ```
@@ -68,9 +66,9 @@ The JUnit style XML report for this project looks like this:
 
 ## Options
 
-`JUnitFormatter` accepts 2 options that can be passed in config.exs (or equivalent environment configuration for tests):
+`JUnitFormatter` accepts 4 options that can be passed in config.exs (or equivalent environment configuration for tests):
 
-- `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console (`Logger.debug fn -> "Junit-formatter report at: #{report_path}" end`). This might help you debug where the file is. By default it writes the report to the `Mix.Project.app_path` folder. This ensures compatibility with umbrella apps.
+- `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console. This might help you debug where the file is. By default it writes the report to the `Mix.Project.app_path` folder. This ensures compatibility with umbrella apps.
 - `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an xml document). 
 - `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash. **IMPORTANT!!** `JUnitFormatter` will **NOT** create the directory. If you are pointing to a directory that is outside _build then it is your duty to clean it and to be sure it exists.
 - `prepend_project_name?` (boolean - default `false`): tells if the report file should have the name of the project as a prefix. See the "Umbrella" part of the documentation.

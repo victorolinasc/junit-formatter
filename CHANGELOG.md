@@ -1,3 +1,21 @@
+## 3.0.0
+
+### Breaking:
+
+- JUnitFormatter now supports only Elixir 1.5+. If you need support for older versions, please use version 2.x.
+
+### Added:
+
+- Error messages now retain their whole format from standard ExUnit formatter (thanks to @hauleth)
+- Refactored the tests to use xpath (thanks to @hauleth)
+- Refactored the code base to be more modern (thanks to @hauleth)
+
+### Bugfixes:
+
+- Fixed options description in README
+- Better CI integration: Credo, test tracing
+- Updated deps (and docs)
+
 ## 2.2.0
 
 ### Bugfixes:

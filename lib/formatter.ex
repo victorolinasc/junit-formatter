@@ -53,8 +53,7 @@ defmodule JUnitFormatter do
 
   defstruct cases: %{}, properties: %{}
 
-  ## Formatter callbacks: may use opts in the future to configure file name pattern
-
+  @impl true
   def init(opts) do
     {:ok,
      %__MODULE__{
@@ -65,6 +64,7 @@ defmodule JUnitFormatter do
      }}
   end
 
+  @impl true
   def handle_cast({:suite_finished, _run_us, _load_us}, config) do
     # do the real magic
     suites = Enum.map(config.cases, &generate_testsuite_xml(&1, config.properties))
@@ -117,7 +117,7 @@ defmodule JUnitFormatter do
 
   @doc "Formats time from nanos to seconds"
   @spec format_time(integer) :: binary
-  def format_time(time), do: :io_lib.format('~.4f', [time / 1_000_000]) |> List.to_string()
+  def format_time(time), do: '~.4f' |> :io_lib.format([time / 1_000_000]) |> List.to_string()
 
   @doc """
   Helper function to get the full path of the generated report file.
@@ -140,17 +140,22 @@ defmodule JUnitFormatter do
 
   defp adjust_case_stats(%ExUnit.Test{case: name, time: time} = test, type, state) do
     cases =
-      Map.update(state.cases, name, struct(Stats, [{type, 1}, test_cases: [test], time: time, tests: 1]), fn stats ->
-        stats =
-          struct(
-            stats,
-            test_cases: [test | stats.test_cases],
-            time: stats.time + time,
-            tests: stats.tests + 1
-          )
+      Map.update(
+        state.cases,
+        name,
+        struct(Stats, [{type, 1}, test_cases: [test], time: time, tests: 1]),
+        fn stats ->
+          stats =
+            struct(
+              stats,
+              test_cases: [test | stats.test_cases],
+              time: stats.time + time,
+              tests: stats.tests + 1
+            )
 
-        if type, do: Map.update!(stats, type, &(&1 + 1)), else: stats
-      end)
+          if type, do: Map.update!(stats, type, &(&1 + 1)), else: stats
+        end
+      )
 
     %{state | cases: cases}
   end

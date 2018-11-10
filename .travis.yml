@@ -1,20 +1,18 @@
 language: elixir
-sudo: false # to use faster container based build environment
+sudo: false
 
 matrix:
   include:
     - otp_release: 19.3
-      elixir: 1.4.5
-    - otp_release: 20.2
       elixir: 1.5.3
     - otp_release: 19.3
-      elixir: 1.6.1
-    - otp_release: 20.2
-      elixir: 1.6.1
+      elixir: 1.6.6
+    - otp_release: 20.3
+      elixir: 1.6.6
+    - otp_release: 21.1
+      elixir: 1.7.4
 
-after_script:
-  - mix deps.get
-  - MIX_ENV=dev mix credo
-  - mix docs # generate docs to check if it is not breaking.
-  - MIX_ENV=test mix coveralls.travis 
-  
+script:
+  - mix credo --strict
+  - MIX_ENV=test mix coveralls.travis --trace --cover
+

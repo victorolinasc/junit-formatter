@@ -19,7 +19,7 @@ defmodule FormatterTest do
   describe "properties" do
     test "contains seed" do
       defsuite do
-        test "it will fail", do: assert false
+        test "it will fail", do: assert(false)
       end
 
       output = run_and_capture_output(seed: 0)
@@ -30,7 +30,7 @@ defmodule FormatterTest do
 
     test "contains date" do
       defsuite do
-        test "it will fail", do: assert false
+        test "it will fail", do: assert(false)
       end
 
       output = run_and_capture_output(seed: 0)
@@ -42,7 +42,7 @@ defmodule FormatterTest do
   describe "testsuites" do
     test "tag is present as a root" do
       defsuite do
-        test "it will fail", do: assert false
+        test "it will fail", do: assert(false)
       end
 
       output = run_and_capture_output()
@@ -117,7 +117,7 @@ defmodule FormatterTest do
   describe "failure" do
     test "contains proper message" do
       defsuite do
-        test "fails", do: assert false
+        test "fails", do: assert(false)
       end
 
       output = run_and_capture_output()
@@ -127,6 +127,7 @@ defmodule FormatterTest do
         ~x{//testcase[@name="test fails"]/failure[@message="Expected truthy, got false"]}
       )
     end
+
     test "it counts raises as failures" do
       defsuite do
         test "raise", do: raise(ArgumentError)

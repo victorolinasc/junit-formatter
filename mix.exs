@@ -1,13 +1,13 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
-  @version "2.2.0"
+  @version "3.0.0"
 
   def project do
     [
       app: :junit_formatter,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.5",
       deps: deps(),
       package: package(),
       consolidate_protocols: Mix.env() != :test,
@@ -33,10 +33,10 @@ defmodule Formatter.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.2", only: :dev},
-      {:ex_doc, "~> 0.18", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:excoveralls, "~> 0.8", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
-      {:credo, "~> 0.9.0-rc6", only: [:dev, :test]},
+      {:credo, "~> 1.0.0-rc1", only: [:dev, :test]},
       {:sweet_xml, "~> 0.6", only: :test}
     ]
   end
