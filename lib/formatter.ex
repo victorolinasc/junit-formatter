@@ -207,7 +207,7 @@ defmodule JUnitFormatter do
     body =
       test
       |> ExUnit.Formatter.format_test_failure(failures, idx, :infinity, fn _, msg -> msg end)
-      |> String.to_charlist()
+      |> :erlang.binary_to_list()
 
     [{:failure, [message: message(failures)], [body]}]
   end
