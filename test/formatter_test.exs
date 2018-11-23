@@ -223,13 +223,21 @@ defmodule FormatterTest do
       test "it can include unicode in test names" do
         defsuite do
           test "make sure 3 ≤ 4" do
-            :ok
+            flunk("This error contains unicodes in failure message -> öäü ≤")
           end
         end
 
         output = run_and_capture_output()
 
         assert_xpath(output, ~x{//testcase[@name="test make sure 3 ≤ 4"]})
+
+        %{message: chars} =
+          xpath(output, ~x{//testcase[@name="test make sure 3 ≤ 4"]/failure},
+            message: ~x"./@message"
+          )
+
+        assert "This error contains unicodes in failure message -> öäü ≤" =
+                 String.Chars.to_string(chars)
       end
     end
   end
