@@ -1,3 +1,11 @@
+# Changelog
+
+## [3.0.1] - 2019-07-11
+
+### Fixed
+
+- Converts String to utf8 charlist, instead of unicode (#34 thank to @mrmstn)
+
 ## 3.0.0
 
 ### Breaking:
