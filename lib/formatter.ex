@@ -185,13 +185,17 @@ defmodule JUnitFormatter do
   end
 
   defp generate_testcases(test, idx) do
+    attrs = [
+      classname: Atom.to_string(test.case),
+      name: Atom.to_string(test.name),
+      time: format_time(test.time)
+    ]
+
+    attrs = maybe_add_filename(attrs, test.tags.file)
+
     {
       :testcase,
-      [
-        classname: Atom.to_string(test.case),
-        name: Atom.to_string(test.name),
-        time: format_time(test.time)
-      ],
+      attrs,
       generate_test_body(test, idx)
     }
   end
@@ -220,4 +224,12 @@ defmodule JUnitFormatter do
   defp message({:error, reason, _}), do: "error: #{Exception.message(reason)}"
   defp message({type, reason, _}) when is_atom(type), do: "#{type}: #{inspect(reason)}"
   defp message({type, reason, _}), do: "#{inspect(type)}: #{inspect(reason)}"
+
+  defp maybe_add_filename(attrs, path) do
+    if Application.get_env(:junit_formatter, :include_filename?) do
+      Keyword.put(attrs, :file, Path.relative_to_cwd(path))
+    else
+      attrs
+    end
+  end
 end
