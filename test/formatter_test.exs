@@ -239,6 +239,28 @@ defmodule FormatterTest do
         assert "This error contains unicodes in failure message -> öäü ≤" =
                  String.Chars.to_string(chars)
       end
+
+      test "has file attribute when configured to" do
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
+
+        put_config(:include_filename?, true)
+        output = run_and_capture_output()
+
+        assert xpath(output, ~x{//testsuite/testcase/@file}s) == "test/formatter_test.exs"
+      end
+
+      test "does not have file attribute when not configured to" do
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
+
+        put_config(:include_filename?, false)
+        output = run_and_capture_output()
+
+        assert xpath(output, ~x{//testsuite/testcase/@file}s) == ""
+      end
     end
   end
 
