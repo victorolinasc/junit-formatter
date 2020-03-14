@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.1.0] - 2020-03-14
+
+### Added
+
+- If `include_filename?` attribute is true, add the relative path from … (#37 thanks to @danadaldos)
+
 ## [3.0.1] - 2019-07-11
 
 ### Fixed
