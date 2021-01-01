@@ -1,11 +1,11 @@
 JUnitFormatter
 =========
 
-[![Build Status](https://travis-ci.org/victorolinasc/junit-formatter.svg)](https://travis-ci.org/victorolinasc/junit-formatter)  [![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](http://hexdocs.pm/junit_formatter/)  [![Downloads](https://img.shields.io/hexpm/dt/junit_formatter.svg)](https://hex.pm/packages/junit_formatter)  [![Coverage Status](https://coveralls.io/repos/github/victorolinasc/junit-formatter/badge.svg?branch=master)](https://coveralls.io/github/victorolinasc/junit-formatter?branch=master)
+[![Build Status](https://travis-ci.org/victorolinasc/junit-formatter.svg)](https://travis-ci.org/victorolinasc/junit-formatter)  [![Hex Version](https://img.shields.io/hexpm/v/junit_formatter.svg)](http://hex.pm/packages/junit_formatter/)  [![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](http://hexdocs.pm/junit_formatter/)  [![Downloads](https://img.shields.io/hexpm/dt/junit_formatter.svg)](https://hex.pm/packages/junit_formatter)  [![Coverage Status](https://coveralls.io/repos/github/victorolinasc/junit-formatter/badge.svg?branch=master)](https://coveralls.io/github/victorolinasc/junit-formatter?branch=master)  [![Last Updated](https://img.shields.io/github/last-commit/victorolinasc/junit-formatter.svg)](https://github.com/victorolinasc/junit-formatter/commits/master)
 
-A simple ExUnit Formatter that collects test results and generates an xml report in JUnit format. This is intended to be used by tools that can produce a graphical report, mainly targeted at Jenkins and its support for JUnit.
+A simple ExUnit Formatter that collects test results and generates an XML report in JUnit format. This is intended to be used by tools that can produce a graphical report, mainly targeted at Jenkins and its support for JUnit.
 
-The report is generated in `Mix.Project.app_path` folder with a default filename of test-junit-report.xml. It can be configured through application configuration on the key report_file (application junit_formatter).
+The report is generated in `Mix.Project.app_path` folder with a default filename of `test-junit-report.xml`. It can be configured through application configuration on the key `report_file` (application `:junit_formatter`).
 
 > Versions 3+ require minimum Elixir version to be 1.5+. For older releases, please use version 2.2 of this library.
 
@@ -62,17 +62,17 @@ The JUnit style XML report for this project looks like this:
 </testsuites>
 ```
 
-*note: this example has been reformatted for readability.*
+*Note: This example has been reformatted for readability.*
 
 ## Options
 
 `JUnitFormatter` accepts 4 options that can be passed in config.exs (or equivalent environment configuration for tests):
 
 - `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console. This might help you debug where the file is. By default it writes the report to the `Mix.Project.app_path` folder. This ensures compatibility with umbrella apps.
-- `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an xml document).
+- `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an XML document).
 - `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash. **IMPORTANT!!** `JUnitFormatter` will **NOT** create the directory. If you are pointing to a directory that is outside _build then it is your duty to clean it and to be sure it exists.
 - `prepend_project_name?` (boolean - default `false`): tells if the report file should have the name of the project as a prefix. See the "Umbrella" part of the documentation.
-- `include_filename?` (boolean - default `false`): dictates whether `<testcase>`s in the XML report should include a "file" attribute of the relative path to the file of the test. Note that this defaults to false because not all JUnit ingesters will accept a file attribute.  
+- `include_filename?` (boolean - default `false`): dictates whether `<testcase>`s in the XML report should include a "file" attribute of the relative path to the file of the test. Note that this defaults to false because not all JUnit ingesters will accept a file attribute.
 
 Example configuration:
 
@@ -89,7 +89,7 @@ This would generate the report at: `/tmp/myapp-report_file_test.xml`.
 
 ## Umbrella projects
 
-`JUnitFormatter` works with umbrella projects too. By default, it will generate the xml report on each sub-project build folder. So, as an example, if you have two apps (`my-app` and `another`) it will generate the following reports:
+`JUnitFormatter` works with umbrella projects too. By default, it will generate the XML report on each sub-project build folder. So, as an example, if you have two apps (`my-app` and `another`) it will generate the following reports:
 
 - `_build/test/lib/my_app/report_file.xml`
 - `_build/test/lib/another/report_file.xml`
@@ -101,7 +101,7 @@ config :junit_formatter,
   report_dir: "/tmp"
 ```
 
-Then, while running in an umbrela project, the first sub-project will run and generate a report file the following path:
+Then, while running in an umbrella project, the first sub-project will run and generate a report file the following path:
 
 - `/tmp/report_file.xml`
 
