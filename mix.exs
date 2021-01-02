@@ -1,6 +1,7 @@
 defmodule Formatter.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/victorolinasc/junit-formatter"
   @version "3.1.0"
 
   def project do
@@ -10,19 +11,11 @@ defmodule Formatter.Mixfile do
       elixir: "~> 1.5",
       deps: deps(),
       package: package(),
+      docs: docs(),
       consolidate_protocols: Mix.env() != :test,
       description: description(),
       name: "JUnit Formatter",
-      test_coverage: [tool: ExCoveralls],
-      docs: [
-        extras: [
-          "README.md": [title: "Overview"],
-          "CHANGELOG.md": [title: "Changelog"]
-        ],
-        main: "readme",
-        source_ref: "v#{@version}",
-        source_url: "https://github.com/victorolinasc/junit-formatter"
-      ]
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -45,11 +38,23 @@ defmodule Formatter.Mixfile do
     [
       files: ["lib", "mix.exs", "README*", "LICENSE*", "CHANGELOG*"],
       maintainers: ["Victor Nascimento"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: %{
-        "Github" => "https://github.com/victorolinasc/junit-formatter",
-        "docs" => "http://hexdocs.pm/junit_formatter/"
+        "Changelog" => @source_url <> "/blob/master/CHANGELOG.md",
+        "GitHub" => @source_url
       }
+    ]
+  end
+
+  defp docs do
+    [
+      extras: [
+        "README.md": [title: "Overview"],
+        "CHANGELOG.md": [title: "Changelog"]
+      ],
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @source_url
     ]
   end
 

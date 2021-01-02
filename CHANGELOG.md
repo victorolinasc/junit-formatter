@@ -10,7 +10,7 @@
 
 ### Fixed
 
-- Converts String to utf8 charlist, instead of unicode (#34 thank to @mrmstn)
+- Converts String to utf8 charlist, instead of Unicode (#34 thank to @mrmstn)
 
 ## 3.0.0
 
@@ -34,7 +34,7 @@
 
 ### Bugfixes:
 
-  - Fix unicode characters in test names on OTP 20. It is important to notice that test names with unicode characters that are not ascii will **ONLY** work if running on OTP 20. Thanks to @sparta-developers
+  - Fix Unicode characters in test names on OTP 20. It is important to notice that test names with Unicode characters that are not ASCII will **ONLY** work if running on OTP 20. Thanks to @sparta-developers
   - Add option of prepending the project name to the report file to avoid overriding the results when in umbrella project. README was also updated. Thanks to @axelson for bringing the issue.
 
 ## 2.1.0
@@ -87,11 +87,11 @@
 
 ### Features:
 
-  - `ExUnit.Formatter` implementation that prints an xml to the build directory.
+  - `ExUnit.Formatter` implementation that prints an XML to the build directory.
   
 ### Bugfixes:
 
   - Correctly show time of testsuite in seconds rather than micro seconds (thanks to [@ibizaman](https://github.com/ibizaman))
   - Correctly handle errors with empty messages (thanks to [@Reimerei](https://github.com/Reimerei))
-  - Fixed name of failed tests tag in xml (thanks to [@KronicDeth](https://github.com/KronicDeth))
+  - Fixed name of failed tests tag in XML (thanks to [@KronicDeth](https://github.com/KronicDeth))
   - Fixed compatibility with Elixir 1.2 (thanks to [@adrienmo](https://github.com/adrienmo))
