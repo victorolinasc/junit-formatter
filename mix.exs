@@ -2,7 +2,7 @@ defmodule Formatter.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/victorolinasc/junit-formatter"
-  @version "3.1.0"
+  @version "3.1.1"
 
   def project do
     [
@@ -20,16 +20,16 @@ defmodule Formatter.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :xmerl]]
   end
 
   defp deps do
     [
-      {:earmark, "~> 1.3", only: :dev},
-      {:ex_doc, "~> 0.20", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12", only: :test},
+      {:earmark, "~> 1.4", only: :dev},
+      {:ex_doc, "~> 0.24", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.14", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
-      {:credo, "~> 1.3.0", only: [:dev, :test]},
+      {:credo, "~> 1.5", only: [:dev, :test]},
       {:sweet_xml, "~> 0.6", only: :test}
     ]
   end
