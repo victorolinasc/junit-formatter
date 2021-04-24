@@ -251,6 +251,18 @@ defmodule FormatterTest do
         assert xpath(output, ~x{//testsuite/testcase/@file}s) == "test/formatter_test.exs"
       end
 
+      test "has file attribute with line when configured to" do
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
+
+        put_config(:include_filename?, true)
+        put_config(:include_file_line?, true)
+        output = run_and_capture_output()
+
+        assert xpath(output, ~x{//testsuite/testcase/@file}s) == "test/formatter_test.exs:256"
+      end
+
       test "does not have file attribute when not configured to" do
         defsuite do
           test "it will fail", do: assert(false)

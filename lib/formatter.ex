@@ -191,7 +191,7 @@ defmodule JUnitFormatter do
       time: format_time(test.time)
     ]
 
-    attrs = maybe_add_filename(attrs, test.tags.file)
+    attrs = maybe_add_filename(attrs, test.tags.file, test.tags.line)
 
     {
       :testcase,
@@ -225,9 +225,18 @@ defmodule JUnitFormatter do
   defp message({type, reason, _}) when is_atom(type), do: "#{type}: #{inspect(reason)}"
   defp message({type, reason, _}), do: "#{inspect(type)}: #{inspect(reason)}"
 
-  defp maybe_add_filename(attrs, path) do
+  defp maybe_add_filename(attrs, path, line) do
     if Application.get_env(:junit_formatter, :include_filename?) do
-      Keyword.put(attrs, :file, Path.relative_to_cwd(path))
+      path = Path.relative_to_cwd(path)
+
+      file =
+        if Application.get_env(:junit_formatter, :include_file_line?) do
+          "#{path}:#{line}"
+        else
+          path
+        end
+
+      Keyword.put(attrs, :file, file)
     else
       attrs
     end
