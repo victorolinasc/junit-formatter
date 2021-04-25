@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  mix_test:
+    name: mix test (Elixir ${{matrix.elixir}} | Erlang/OTP ${{matrix.otp}})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - elixir: 1.5.x
+            otp: 21.3.8.20
+          - elixir: 1.7.x
+            otp: 21.3.8.20
+          - elixir: 1.9.x
+            otp: 21.3.8.20
+          - elixir: 1.11.x
+            otp: 21.3.8.20
+          - elixir: 1.11.x
+            otp: 23.2.x
+    env:
+      MIX_ENV: test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: erlef/setup-elixir@v1
+        with:
+          otp-version: ${{matrix.otp}}
+          elixir-version: ${{matrix.elixir}}
+      - name: Install Dependencies
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get --only test
+      - run: mix format --check-formatted
+        if: matrix.check_formatted
+      - run: mix compile --warnings-as-errors
+        if: matrix.warnings_as_errors
+      - run: mix test
