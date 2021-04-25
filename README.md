@@ -1,7 +1,13 @@
 JUnitFormatter
 =========
 
-[![Build Status](https://travis-ci.org/victorolinasc/junit-formatter.svg)](https://travis-ci.org/victorolinasc/junit-formatter)  [![Hex Version](https://img.shields.io/hexpm/v/junit_formatter.svg)](http://hex.pm/packages/junit_formatter/)  [![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](http://hexdocs.pm/junit_formatter/)  [![Downloads](https://img.shields.io/hexpm/dt/junit_formatter.svg)](https://hex.pm/packages/junit_formatter)  [![Coverage Status](https://coveralls.io/repos/github/victorolinasc/junit-formatter/badge.svg?branch=master)](https://coveralls.io/github/victorolinasc/junit-formatter?branch=master)  [![Last Updated](https://img.shields.io/github/last-commit/victorolinasc/junit-formatter.svg)](https://github.com/victorolinasc/junit-formatter/commits/master)
+
+[![Build Status](https://github.com/victorolinasc/junit-formatter/workflows/CI/badge.svg)](https://github.com/victorolinasc/junit-formatter/actions?query=workflow%3A%22CI%22)
+[![Hex Version](https://img.shields.io/hexpm/v/junit_formatter.svg)](http://hex.pm/packages/junit_formatter/)  
+[![Documentation](https://img.shields.io/badge/docs-hexpm-blue.svg)](http://hexdocs.pm/junit_formatter/)  
+[![Downloads](https://img.shields.io/hexpm/dt/junit_formatter.svg)](https://hex.pm/packages/junit_formatter)  
+[![Coverage Status](https://coveralls.io/repos/github/victorolinasc/junit-formatter/badge.svg?branch=master)](https://coveralls.io/github/victorolinasc/junit-formatter?branch=master)  
+[![Last Updated](https://img.shields.io/github/last-commit/victorolinasc/junit-formatter.svg)](https://github.com/victorolinasc/junit-formatter/commits/master)
 
 A simple ExUnit Formatter that collects test results and generates an XML report in JUnit format. This is intended to be used by tools that can produce a graphical report, mainly targeted at Jenkins and its support for JUnit.
 
