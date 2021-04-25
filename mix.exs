@@ -20,7 +20,7 @@ defmodule Formatter.Mixfile do
   end
 
   def application do
-    [applications: [:logger, :xmerl]]
+    [extra_applications: [:logger, :xmerl]]
   end
 
   defp deps do

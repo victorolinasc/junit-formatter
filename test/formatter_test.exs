@@ -219,6 +219,11 @@ defmodule FormatterTest do
   end
 
   describe "testcase" do
+    setup do
+      on_exit(fn -> reset_config() end)
+      :ok
+    end
+
     if System.otp_release() >= "20" do
       test "it can include unicode in test names" do
         defsuite do
@@ -260,7 +265,7 @@ defmodule FormatterTest do
         put_config(:include_file_line?, true)
         output = run_and_capture_output()
 
-        assert xpath(output, ~x{//testsuite/testcase/@file}s) == "test/formatter_test.exs:256"
+        assert xpath(output, ~x{//testsuite/testcase/@file}s) == "test/formatter_test.exs:261"
       end
 
       test "does not have file attribute when not configured to" do
@@ -289,7 +294,6 @@ defmodule FormatterTest do
   describe "configuration" do
     setup do
       on_exit(&reset_config/0)
-
       :ok
     end
 
@@ -320,6 +324,7 @@ defmodule FormatterTest do
     put_config(:report_file, "report_file_test.xml")
     put_config(:report_dir, Mix.Project.app_path())
     put_config(:prepend_project_name?, false)
+    put_config(:include_file_line?, false)
   end
 
   defp get_config(name), do: Application.get_env(:junit_formatter, name)
@@ -331,9 +336,9 @@ defmodule FormatterTest do
     funs = ExUnit.Server.__info__(:functions)
 
     if Keyword.has_key?(funs, :modules_loaded) do
-      ExUnit.Server.modules_loaded()
+      apply(ExUnit.Server, :modules_loaded, [])
     else
-      ExUnit.Server.cases_loaded()
+      apply(ExUnit.Server, :cases_loaded, [])
     end
 
     ExUnit.run()
