@@ -2,7 +2,7 @@ defmodule Formatter.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/victorolinasc/junit-formatter"
-  @version "3.1.1"
+  @version "3.2.0"
 
   def project do
     [

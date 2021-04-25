@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0] - 2021-04-24
+
+### Added
+
+- Option to include line number in reports. Fixes #40. (#41 thanks to @icehaunter)
+
+### Fixed
+
+- Using `extra_applications` instead of `applications`
+- Switched CI system
+- Removed warnings in tests
+
 ## [3.1.0] - 2020-03-14
 
 ### Added
