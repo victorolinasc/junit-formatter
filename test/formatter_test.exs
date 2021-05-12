@@ -317,6 +317,18 @@ defmodule FormatterTest do
       assert JUnitFormatter.get_report_file_path() ==
                "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
     end
+
+    test "create directory at init" do
+      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
+
+      put_config(:automatic_create_dir?, true)
+      put_config(:report_dir, tmp_dir)
+
+      {:ok, _} = JUnitFormatter.init(seed: 1)
+
+      assert File.exists?(tmp_dir)
+      File.rmdir!(tmp_dir)
+    end
   end
 
   # Utilities --------------------
@@ -325,6 +337,7 @@ defmodule FormatterTest do
     put_config(:report_dir, Mix.Project.app_path())
     put_config(:prepend_project_name?, false)
     put_config(:include_file_line?, false)
+    put_config(:automatic_create_dir?, false)
   end
 
   defp get_config(name), do: Application.get_env(:junit_formatter, name)

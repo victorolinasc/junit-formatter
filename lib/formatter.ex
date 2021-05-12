@@ -55,6 +55,13 @@ defmodule JUnitFormatter do
 
   @impl true
   def init(opts) do
+    automatic_create_dir? = Application.get_env(:junit_formatter, :automatic_create_dir?, false)
+    if automatic_create_dir? do
+      # TODO: add warning message.
+      report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
+      File.mkdir_p(report_dir)
+    end
+
     {:ok,
      %__MODULE__{
        properties: %{
