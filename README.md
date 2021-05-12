@@ -71,10 +71,11 @@ The JUnit style XML report for this project looks like this:
 
 - `print_report_file` (boolean - default `false`): tells formatter if you want to see the path where the file is being written to in the console. This might help you debug where the file is. By default it writes the report to the `Mix.Project.app_path` folder. This ensures compatibility with umbrella apps.
 - `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an XML document).
-- `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash. **IMPORTANT!!** `JUnitFormatter` will **NOT** create the directory. If you are pointing to a directory that is outside _build then it is your duty to clean it and to be sure it exists.
+- `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash. **IMPORTANT!!** `JUnitFormatter` will **NOT** create the directory. If you are pointing to a directory that is outside _build then it is your duty to clean it and to be sure it exists or set `automatic_create_dir?` to `true`.
 - `prepend_project_name?` (boolean - default `false`): tells if the report file should have the name of the project as a prefix. See the "Umbrella" part of the documentation.
 - `include_filename?` (boolean - default `false`): dictates whether `<testcase>`s in the XML report should include a "file" attribute of the relative path to the file of the test. Note that this defaults to false because not all JUnit ingesters will accept a file attribute.
 - `include_file_line?` (boolean - default `false`): only has effect when `include_filename?` is `true`. Dictates whether `file` attribute should include line of the test after a colon (e.g. `test/file_test.exs:123`).
+- `automatic_create_dir?` (boolean - default `false`): create a directory that defined in `report_dir` before writing report files.
 
 Example configuration:
 
