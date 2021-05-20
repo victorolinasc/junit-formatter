@@ -65,7 +65,7 @@ defmodule JUnitFormatter do
   end
 
   @impl true
-  def handle_cast({:suite_finished, _run_us, _load_us}, config) do
+  def handle_cast({:suite_finished, %{async: _, load: _, run: _}}, config) do
     # do the real magic
     suites = Enum.map(config.cases, &generate_testsuite_xml(&1, config.properties))
     # wrap result in a root node (not adding any attribute to root)
