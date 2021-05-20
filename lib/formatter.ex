@@ -66,19 +66,13 @@ defmodule JUnitFormatter do
 
   @impl true
   def handle_cast({:suite_finished, %{async: _, load: _, run: _}}, config) do
-    # do the real magic
-    suites = Enum.map(config.cases, &generate_testsuite_xml(&1, config.properties))
-    # wrap result in a root node (not adding any attribute to root)
-    result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
+    handle_suite_finished(config)
 
-    # save the report in an XML file
-    file_name = get_report_file_path()
+    {:noreply, config}
+  end
 
-    :ok = File.write!(file_name, result, [:write])
-
-    if Application.get_env(:junit_formatter, :print_report_file, false) do
-      IO.puts(:stderr, "Wrote JUnit report to: #{file_name}")
-    end
+  def handle_cast({:suite_finished, _run_us, _load_us}, config) do
+    handle_suite_finished(config)
 
     {:noreply, config}
   end
@@ -137,6 +131,22 @@ defmodule JUnitFormatter do
   end
 
   # PRIVATE ------------
+
+  defp handle_suite_finished(config) do
+    # do the real magic
+    suites = Enum.map(config.cases, &generate_testsuite_xml(&1, config.properties))
+    # wrap result in a root node (not adding any attribute to root)
+    result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
+
+    # save the report in an XML file
+    file_name = get_report_file_path()
+
+    :ok = File.write!(file_name, result, [:write])
+
+    if Application.get_env(:junit_formatter, :print_report_file, false) do
+      IO.puts(:stderr, "Wrote JUnit report to: #{file_name}")
+    end
+  end
 
   defp adjust_case_stats(%ExUnit.Test{case: name, time: time} = test, type, state) do
     cases =
