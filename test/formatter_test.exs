@@ -329,6 +329,20 @@ defmodule FormatterTest do
       assert File.exists?(tmp_dir)
       File.rmdir!(tmp_dir)
     end
+
+    test "create exist directory at init" do
+      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
+
+      put_config(:automatic_create_dir?, true)
+      put_config(:report_dir, tmp_dir)
+
+      File.mkdir!(tmp_dir)
+
+      {:ok, _} = JUnitFormatter.init(seed: 1)
+
+      assert File.exists?(tmp_dir)
+      File.rmdir!(tmp_dir)
+    end
   end
 
   # Utilities --------------------
