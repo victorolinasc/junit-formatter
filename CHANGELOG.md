@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.3.0] - 2021-05-29
+
+### Added
+
+- Automatically creates report_dir (#44 thanks to @wingyplus)
+
+### Fixes
+
+- Make it work with Elixir 1.12 (#45 thanks to @irgendeinich)
+
 ## [3.2.0] - 2021-04-24
 
 ### Added
