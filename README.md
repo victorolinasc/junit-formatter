@@ -73,6 +73,7 @@ The JUnit style XML report for this project looks like this:
 - `report_file` (binary - default `"test-junit-report.xml"`): the name of the file to write to. It must contain the extension. 99% of the time you will want the extension to be `.xml`, but if you don't you can pass any extension (though the contents of the file will be an XML document).
 - `report_dir` (binary - default `Mix.Project.app_path()`): the directory to which the formatter will write the report. Do not end it with a slash. **IMPORTANT!!** `JUnitFormatter` will **NOT**, by default, create the directory. If you are pointing to a directory that is outside _build then you can set the `automatic_create_dir?` option. 
 - `prepend_project_name?` (boolean - default `false`): tells if the report file should have the name of the project as a prefix. See the "Umbrella" part of the documentation.
+- `use_project_subdirectory?` (boolean - default `false`): determines if the report file should be put into a subdirectory under `report_dir` named according to the project. If you set this then `automatic_create_dir?` will also be set to `true`. See the "Umbrella" part of the documentation.
 - `include_filename?` (boolean - default `false`): dictates whether `<testcase>`s in the XML report should include a "file" attribute of the relative path to the file of the test. Note that this defaults to false because not all JUnit ingesters will accept a file attribute.
 - `include_file_line?` (boolean - default `false`): only has effect when `include_filename?` is `true`. Dictates whether `file` attribute should include line of the test after a colon (e.g. `test/file_test.exs:123`).
 - `automatic_create_dir?` (boolean - default `false`): create a directory that defined in `report_dir` before writing report files.
@@ -113,12 +114,16 @@ The next one will do the same **OVERRIDING** the first one. So, in order to avoi
 - `/tmp/my_app-report_file.xml`
 - `/tmp/another-report_file.xml`
 
+If you want to use a consistent report filename, and instead place the reports under a subdirectory per application, then set the `use_project_subdirectory?` configuration flag to `true`. Using this configuration would result in the following file layout:
+
+- `/tmp/my_app/report_file.xml`
+- `/tmp/another/report_file.xml`
+
 ## Integrating on CI systems
 
 Most CIs have a way for uploading test reports. This is a nice way to understand what failed on your build. Most of them use the JUnit report file format to provide this feature.
 
-- [CircleCI](https://circleci.com/docs/2.0/language-elixir/) example configuration provides JUnit reports integration
-
+- [CircleCI](https://circleci.com/docs/2.0/language-elixir/) example configuration provides JUnit reports integration. For umbrella projects, if you set `use_project_subdirectory?: true` then CircleCI will provide reports per application.
 
 ## LICENSE
 
