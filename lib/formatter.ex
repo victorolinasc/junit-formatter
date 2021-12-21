@@ -129,14 +129,17 @@ defmodule JUnitFormatter do
   def get_report_file_path do
     report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
 
-    Path.join([report_dir(), report_file])
+    prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
+    prefix = if prepend, do: "#{Mix.Project.config()[:app]}-", else: ""
+
+    Path.join([report_dir(), prefix <> report_file])
   end
 
   defp report_dir do
-    prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
+    subdir = Application.get_env(:junit_formatter, :use_project_subdirectory?, false)
 
     report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
-    prefix = if prepend, do: "#{Mix.Project.config()[:app]}", else: ""
+    prefix = if subdir, do: "#{Mix.Project.config()[:app]}", else: ""
 
     Path.join([report_dir, prefix])
   end

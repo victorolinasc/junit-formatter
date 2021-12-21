@@ -309,8 +309,16 @@ defmodule FormatterTest do
     end
 
     test "it can prepend the project name to the report file" do
-      # Ensure defaults
       put_config(:prepend_project_name?, true)
+
+      assert get_config(:report_file) == "report_file_test.xml"
+
+      assert JUnitFormatter.get_report_file_path() ==
+               "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
+    end
+
+    test "it can put the report file in a project sub-directory" do
+      put_config(:use_project_subdirectory?, true)
 
       assert get_config(:report_file) == "report_file_test.xml"
 
@@ -328,6 +336,19 @@ defmodule FormatterTest do
 
       assert File.exists?(tmp_dir)
       File.rmdir!(tmp_dir)
+    end
+
+    test "create sub-directory at init" do
+      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
+
+      put_config(:use_project_subdirectory?, true)
+      put_config(:automatic_create_dir?, true)
+      put_config(:report_dir, tmp_dir)
+
+      {:ok, _} = JUnitFormatter.init(seed: 1)
+
+      assert File.exists?(Path.join(tmp_dir, "junit_formatter"))
+      File.rm_rf!(tmp_dir)
     end
 
     test "create exist directory at init" do
@@ -352,6 +373,7 @@ defmodule FormatterTest do
     put_config(:prepend_project_name?, false)
     put_config(:include_file_line?, false)
     put_config(:automatic_create_dir?, false)
+    put_config(:use_project_subdirectory?, false)
   end
 
   defp get_config(name), do: Application.get_env(:junit_formatter, name)
