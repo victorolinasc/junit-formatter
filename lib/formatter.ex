@@ -56,9 +56,9 @@ defmodule JUnitFormatter do
   @impl true
   def init(opts) do
     automatic_create_dir? = Application.get_env(:junit_formatter, :automatic_create_dir?, false)
+
     if automatic_create_dir? do
-      report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
-      :ok = File.mkdir_p(report_dir)
+      :ok = File.mkdir_p(report_dir())
     end
 
     {:ok,
@@ -127,13 +127,18 @@ defmodule JUnitFormatter do
   """
   @spec get_report_file_path() :: String.t()
   def get_report_file_path do
+    report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
+
+    Path.join([report_dir(), report_file])
+  end
+
+  defp report_dir do
     prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
 
-    report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
     report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
     prefix = if prepend, do: "#{Mix.Project.config()[:app]}", else: ""
 
-    Path.join([report_dir, prefix, report_file])
+    Path.join([report_dir, prefix])
   end
 
   # PRIVATE ------------
