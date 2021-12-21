@@ -315,7 +315,7 @@ defmodule FormatterTest do
       assert get_config(:report_file) == "report_file_test.xml"
 
       assert JUnitFormatter.get_report_file_path() ==
-               "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
+               "#{Mix.Project.app_path()}/junit_formatter/report_file_test.xml"
     end
 
     test "create directory at init" do

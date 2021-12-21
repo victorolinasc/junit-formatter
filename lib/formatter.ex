@@ -131,9 +131,9 @@ defmodule JUnitFormatter do
 
     report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
     report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
-    prefix = if prepend, do: "#{Mix.Project.config()[:app]}-", else: ""
+    prefix = if prepend, do: "#{Mix.Project.config()[:app]}", else: ""
 
-    Path.join(report_dir, prefix <> report_file)
+    Path.join([report_dir, prefix, report_file])
   end
 
   # PRIVATE ------------
