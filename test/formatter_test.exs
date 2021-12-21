@@ -351,6 +351,19 @@ defmodule FormatterTest do
       File.rm_rf!(tmp_dir)
     end
 
+    test "always create sub-directory at init even without automatic_create_dir?" do
+      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
+
+      put_config(:use_project_subdirectory?, true)
+      put_config(:automatic_create_dir?, false)
+      put_config(:report_dir, tmp_dir)
+
+      {:ok, _} = JUnitFormatter.init(seed: 1)
+
+      assert File.exists?(Path.join(tmp_dir, "junit_formatter"))
+      File.rm_rf!(tmp_dir)
+    end
+
     test "create exist directory at init" do
       tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
 

@@ -55,9 +55,7 @@ defmodule JUnitFormatter do
 
   @impl true
   def init(opts) do
-    automatic_create_dir? = Application.get_env(:junit_formatter, :automatic_create_dir?, false)
-
-    if automatic_create_dir? do
+    if automatic_create_dir?() do
       :ok = File.mkdir_p(report_dir())
     end
 
@@ -142,6 +140,13 @@ defmodule JUnitFormatter do
     prefix = if subdir, do: "#{Mix.Project.config()[:app]}", else: ""
 
     Path.join([report_dir, prefix])
+  end
+
+  defp automatic_create_dir? do
+    automatic_create_dir? = Application.get_env(:junit_formatter, :automatic_create_dir?, false)
+    use_project_subdir? = Application.get_env(:junit_formatter, :use_project_subdirectory?, false)
+
+    automatic_create_dir? || use_project_subdir?
   end
 
   # PRIVATE ------------
