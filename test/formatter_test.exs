@@ -278,6 +278,22 @@ defmodule FormatterTest do
 
         assert xpath(output, ~x{//testsuite/testcase/@file}s) == ""
       end
+
+      test "makes path relative to project_dir if set" do
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
+
+        parent_dir = Path.expand("../..", __DIR__)
+        repo_dir_name = Path.expand("..", __DIR__) |> Path.basename()
+
+        put_config(:include_filename?, true)
+        put_config(:project_dir, parent_dir)
+        output = run_and_capture_output()
+
+        assert xpath(output, ~x{//testsuite/testcase/@file}s) ==
+                 "#{repo_dir_name}/test/formatter_test.exs"
+      end
     end
   end
 
@@ -387,6 +403,7 @@ defmodule FormatterTest do
     put_config(:include_file_line?, false)
     put_config(:automatic_create_dir?, false)
     put_config(:use_project_subdirectory?, false)
+    put_config(:project_dir, nil)
   end
 
   defp get_config(name), do: Application.get_env(:junit_formatter, name)

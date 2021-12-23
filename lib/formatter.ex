@@ -256,7 +256,7 @@ defmodule JUnitFormatter do
 
   defp maybe_add_filename(attrs, path, line) do
     if Application.get_env(:junit_formatter, :include_filename?) do
-      path = Path.relative_to_cwd(path)
+      path = relative_path(path)
 
       file =
         if Application.get_env(:junit_formatter, :include_file_line?) do
@@ -269,5 +269,10 @@ defmodule JUnitFormatter do
     else
       attrs
     end
+  end
+
+  defp relative_path(path) do
+    root = Application.get_env(:junit_formatter, :project_dir, nil) || File.cwd!()
+    Path.relative_to(path, root)
   end
 end

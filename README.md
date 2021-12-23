@@ -77,6 +77,7 @@ The JUnit style XML report for this project looks like this:
 - `include_filename?` (boolean - default `false`): dictates whether `<testcase>`s in the XML report should include a "file" attribute of the relative path to the file of the test. Note that this defaults to false because not all JUnit ingesters will accept a file attribute.
 - `include_file_line?` (boolean - default `false`): only has effect when `include_filename?` is `true`. Dictates whether `file` attribute should include line of the test after a colon (e.g. `test/file_test.exs:123`).
 - `automatic_create_dir?` (boolean - default `false`): create a directory that defined in `report_dir` before writing report files.
+- `project_dir` (string - default `nil`). Specifies which directory the test file paths should be relative to within the XML. If unset or `nil`, the path to the test file is calculated relative to the current working directory.
 
 Example configuration:
 
@@ -119,11 +120,20 @@ If you want to use a consistent report filename, and instead place the reports u
 - `/tmp/my_app/report_file.xml`
 - `/tmp/another/report_file.xml`
 
+If you want to specify the paths to the test files in the report relative to the root of the umbrella project, not the individual application, then set `project_dir`. In your umbrella configuration file, at `config/test.exs`, if you set the following configuration:
+
+``` elixir
+config :junit_formatter,
+  project_dir: Path.expand("..", __DIR__)
+```
+
+Then in your report, a test file within your umbrella at `apps/my_app/test/my_app_test.exs` will be specified within the report as `apps/my_app/test/my_app_test.exs`. If you leave `project_dir` unset it would instead be specified as `test/my_app_test.exs`.
+
 ## Integrating on CI systems
 
 Most CIs have a way for uploading test reports. This is a nice way to understand what failed on your build. Most of them use the JUnit report file format to provide this feature.
 
-- [CircleCI](https://circleci.com/docs/2.0/language-elixir/) example configuration provides JUnit reports integration. For umbrella projects, if you set `use_project_subdirectory?: true` then CircleCI will provide reports per application.
+- [CircleCI](https://circleci.com/docs/2.0/language-elixir/) example configuration provides JUnit reports integration. For umbrella projects, if you set `use_project_subdirectory?: true` then CircleCI will provide reports per application. It is also advisable to set `project_dir` for umbrella projects so that files will be reported with their full path.
 
 ## LICENSE
 
