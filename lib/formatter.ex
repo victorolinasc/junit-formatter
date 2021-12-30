@@ -55,10 +55,8 @@ defmodule JUnitFormatter do
 
   @impl true
   def init(opts) do
-    automatic_create_dir? = Application.get_env(:junit_formatter, :automatic_create_dir?, false)
-    if automatic_create_dir? do
-      report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
-      :ok = File.mkdir_p(report_dir)
+    if automatic_create_dir?() do
+      :ok = File.mkdir_p(report_dir())
     end
 
     {:ok,
@@ -127,13 +125,28 @@ defmodule JUnitFormatter do
   """
   @spec get_report_file_path() :: String.t()
   def get_report_file_path do
-    prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
-
     report_file = Application.get_env(:junit_formatter, :report_file, "test-junit-report.xml")
-    report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
+
+    prepend = Application.get_env(:junit_formatter, :prepend_project_name?, false)
     prefix = if prepend, do: "#{Mix.Project.config()[:app]}-", else: ""
 
-    Path.join(report_dir, prefix <> report_file)
+    Path.join([report_dir(), prefix <> report_file])
+  end
+
+  defp report_dir do
+    subdir = Application.get_env(:junit_formatter, :use_project_subdirectory?, false)
+
+    report_dir = Application.get_env(:junit_formatter, :report_dir, Mix.Project.app_path())
+    prefix = if subdir, do: "#{Mix.Project.config()[:app]}", else: ""
+
+    Path.join([report_dir, prefix])
+  end
+
+  defp automatic_create_dir? do
+    automatic_create_dir? = Application.get_env(:junit_formatter, :automatic_create_dir?, false)
+    use_project_subdir? = Application.get_env(:junit_formatter, :use_project_subdirectory?, false)
+
+    automatic_create_dir? || use_project_subdir?
   end
 
   # PRIVATE ------------
@@ -243,7 +256,7 @@ defmodule JUnitFormatter do
 
   defp maybe_add_filename(attrs, path, line) do
     if Application.get_env(:junit_formatter, :include_filename?) do
-      path = Path.relative_to_cwd(path)
+      path = relative_path(path)
 
       file =
         if Application.get_env(:junit_formatter, :include_file_line?) do
@@ -256,5 +269,10 @@ defmodule JUnitFormatter do
     else
       attrs
     end
+  end
+
+  defp relative_path(path) do
+    root = Application.get_env(:junit_formatter, :project_dir, nil) || File.cwd!()
+    Path.relative_to(path, root)
   end
 end

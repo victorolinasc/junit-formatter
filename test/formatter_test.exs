@@ -278,6 +278,22 @@ defmodule FormatterTest do
 
         assert xpath(output, ~x{//testsuite/testcase/@file}s) == ""
       end
+
+      test "makes path relative to project_dir if set" do
+        defsuite do
+          test "it will fail", do: assert(false)
+        end
+
+        parent_dir = Path.expand("../..", __DIR__)
+        repo_dir_name = Path.expand("..", __DIR__) |> Path.basename()
+
+        put_config(:include_filename?, true)
+        put_config(:project_dir, parent_dir)
+        output = run_and_capture_output()
+
+        assert xpath(output, ~x{//testsuite/testcase/@file}s) ==
+                 "#{repo_dir_name}/test/formatter_test.exs"
+      end
     end
   end
 
@@ -309,13 +325,21 @@ defmodule FormatterTest do
     end
 
     test "it can prepend the project name to the report file" do
-      # Ensure defaults
       put_config(:prepend_project_name?, true)
 
       assert get_config(:report_file) == "report_file_test.xml"
 
       assert JUnitFormatter.get_report_file_path() ==
                "#{Mix.Project.app_path()}/junit_formatter-report_file_test.xml"
+    end
+
+    test "it can put the report file in a project sub-directory" do
+      put_config(:use_project_subdirectory?, true)
+
+      assert get_config(:report_file) == "report_file_test.xml"
+
+      assert JUnitFormatter.get_report_file_path() ==
+               "#{Mix.Project.app_path()}/junit_formatter/report_file_test.xml"
     end
 
     test "create directory at init" do
@@ -328,6 +352,32 @@ defmodule FormatterTest do
 
       assert File.exists?(tmp_dir)
       File.rmdir!(tmp_dir)
+    end
+
+    test "create sub-directory at init" do
+      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
+
+      put_config(:use_project_subdirectory?, true)
+      put_config(:automatic_create_dir?, true)
+      put_config(:report_dir, tmp_dir)
+
+      {:ok, _} = JUnitFormatter.init(seed: 1)
+
+      assert File.exists?(Path.join(tmp_dir, "junit_formatter"))
+      File.rm_rf!(tmp_dir)
+    end
+
+    test "always create sub-directory at init even without automatic_create_dir?" do
+      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
+
+      put_config(:use_project_subdirectory?, true)
+      put_config(:automatic_create_dir?, false)
+      put_config(:report_dir, tmp_dir)
+
+      {:ok, _} = JUnitFormatter.init(seed: 1)
+
+      assert File.exists?(Path.join(tmp_dir, "junit_formatter"))
+      File.rm_rf!(tmp_dir)
     end
 
     test "create exist directory at init" do
@@ -352,6 +402,8 @@ defmodule FormatterTest do
     put_config(:prepend_project_name?, false)
     put_config(:include_file_line?, false)
     put_config(:automatic_create_dir?, false)
+    put_config(:use_project_subdirectory?, false)
+    put_config(:project_dir, nil)
   end
 
   defp get_config(name), do: Application.get_env(:junit_formatter, name)
