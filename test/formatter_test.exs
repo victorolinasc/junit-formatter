@@ -351,7 +351,7 @@ defmodule FormatterTest do
       {:ok, _} = JUnitFormatter.init(seed: 1)
 
       assert File.exists?(tmp_dir)
-      File.rmdir!(tmp_dir)
+      File.rm_rf!(tmp_dir)
     end
 
     test "create sub-directory at init" do
@@ -380,18 +380,14 @@ defmodule FormatterTest do
       File.rm_rf!(tmp_dir)
     end
 
-    test "create exist directory at init" do
-      tmp_dir = Path.join([Mix.Project.app_path(), System.tmp_dir!()])
-
+    @tag :tmp_dir
+    test "create exist directory at init", %{tmp_dir: tmp_dir} do
       put_config(:automatic_create_dir?, true)
       put_config(:report_dir, tmp_dir)
-
-      File.mkdir!(tmp_dir)
 
       {:ok, _} = JUnitFormatter.init(seed: 1)
 
       assert File.exists?(tmp_dir)
-      File.rmdir!(tmp_dir)
     end
   end
 

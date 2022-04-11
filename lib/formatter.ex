@@ -51,7 +51,7 @@ defmodule JUnitFormatter do
           }
   end
 
-  defstruct cases: %{}, properties: %{}
+  defstruct file: nil, properties: %{}, module_stats: %{}
 
   @impl true
   def init(opts) do
@@ -59,13 +59,28 @@ defmodule JUnitFormatter do
       :ok = File.mkdir_p(report_dir())
     end
 
+    file_name = get_report_file_path()
+    file = File.open!(file_name, [:write, {:delayed_write, 1000, 200}])
+
+    if Application.get_env(:junit_formatter, :print_report_file, false) do
+      IO.puts(:stderr, "Writing JUnit report to: #{file_name}")
+    end
+
     {:ok,
      %__MODULE__{
        properties: %{
          seed: opts[:seed],
          date: DateTime.to_iso8601(DateTime.utc_now())
-       }
+       },
+       file: file
      }}
+  end
+
+  @impl true
+  def handle_cast({:suite_started, _opts}, config) do
+    handle_suite_started(config)
+
+    {:noreply, config}
   end
 
   @impl true
@@ -79,6 +94,25 @@ defmodule JUnitFormatter do
     handle_suite_finished(config)
 
     {:noreply, config}
+  end
+
+  def handle_cast({:module_started, test_module}, config) do
+    updated_config = %{
+      config
+      | module_stats: Map.put(config.module_stats, test_module.name, %Stats{})
+    }
+
+    {:noreply, updated_config}
+  end
+
+  # When a module is finished, we write it out as a testsuite into the report file
+  def handle_cast({:module_finished, test_module}, config) do
+    module_stats = Map.fetch!(config.module_stats, test_module.name)
+    suite_xml = generate_testsuite_xml({test_module.name, module_stats}, config.properties)
+    result = :xmerl.export_simple_element(suite_xml, :xmerl_xml)
+    IO.binwrite(config.file, result)
+
+    {:noreply, %{config | module_stats: Map.delete(config.module_stats, test_module.name)}}
   end
 
   def handle_cast({:test_finished, %ExUnit.Test{state: nil} = test}, config) do
@@ -151,44 +185,34 @@ defmodule JUnitFormatter do
 
   # PRIVATE ------------
 
-  defp handle_suite_finished(config) do
-    # do the real magic
-    suites = Enum.map(config.cases, &generate_testsuite_xml(&1, config.properties))
-    # wrap result in a root node (not adding any attribute to root)
-    result = :xmerl.export_simple([{:testsuites, [], suites}], :xmerl_xml)
-
-    # save the report in an XML file
-    file_name = get_report_file_path()
-
-    :ok = File.write!(file_name, result, [:write])
-
-    if Application.get_env(:junit_formatter, :print_report_file, false) do
-      IO.puts(:stderr, "Wrote JUnit report to: #{file_name}")
-    end
+  defp handle_suite_started(config) do
+    :ok = IO.binwrite(config.file, :xmerl.export_simple([], :xmerl_xml))
+    :ok = IO.binwrite(config.file, "<testsuites>")
   end
 
-  defp adjust_case_stats(%ExUnit.Test{case: name, time: time} = test, type, state) do
-    test_without_logs = %ExUnit.Test{test | logs: ""}
+  defp handle_suite_finished(config) do
+    :ok = IO.binwrite(config.file, "</testsuites>")
+    :ok = File.close(config.file)
+  end
 
-    cases =
-      Map.update(
-        state.cases,
-        name,
-        struct(Stats, [{type, 1}, test_cases: [test_without_logs], time: time, tests: 1]),
-        fn stats ->
-          stats =
-            struct(
-              stats,
-              test_cases: [test_without_logs | stats.test_cases],
-              time: stats.time + time,
-              tests: stats.tests + 1
-            )
+  defp adjust_case_stats(%ExUnit.Test{} = test, type, config) do
+    module_stats = Map.fetch!(config.module_stats, test.module)
 
-          if type, do: Map.update!(stats, type, &(&1 + 1)), else: stats
-        end
-      )
+    updated_stats = %Stats{
+      module_stats
+      | test_cases: [%ExUnit.Test{test | logs: ""} | module_stats.test_cases],
+        time: module_stats.time + test.time,
+        tests: module_stats.tests + 1
+    }
 
-    %{state | cases: cases}
+    updated_stats = if type, do: Map.update!(updated_stats, type, &(&1 + 1)), else: updated_stats
+
+    updated_config = %{
+      config
+      | module_stats: Map.put(config.module_stats, test.module, updated_stats)
+    }
+
+    updated_config
   end
 
   defp generate_testsuite_xml({name, %Stats{} = stats}, properties) do
