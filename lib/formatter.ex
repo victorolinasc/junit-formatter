@@ -168,16 +168,18 @@ defmodule JUnitFormatter do
   end
 
   defp adjust_case_stats(%ExUnit.Test{case: name, time: time} = test, type, state) do
+    test_without_logs = %ExUnit.Test{test | logs: ""}
+
     cases =
       Map.update(
         state.cases,
         name,
-        struct(Stats, [{type, 1}, test_cases: [test], time: time, tests: 1]),
+        struct(Stats, [{type, 1}, test_cases: [test_without_logs], time: time, tests: 1]),
         fn stats ->
           stats =
             struct(
               stats,
-              test_cases: [test | stats.test_cases],
+              test_cases: [test_without_logs | stats.test_cases],
               time: stats.time + time,
               tests: stats.tests + 1
             )
