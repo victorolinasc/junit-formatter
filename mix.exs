@@ -26,11 +26,11 @@ defmodule Formatter.Mixfile do
   defp deps do
     [
       {:earmark, "~> 1.4", only: :dev},
-      {:ex_doc, "~> 0.24", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:excoveralls, "~> 0.14", only: :test},
       {:exjsx, "~> 4.0", only: :test, override: true},
-      {:credo, "~> 1.5", only: [:dev, :test]},
-      {:sweet_xml, "~> 0.6", only: :test}
+      {:credo, "~> 1.6", only: [:dev, :test]},
+      {:sweet_xml, "~> 0.7", only: :test}
     ]
   end
 
