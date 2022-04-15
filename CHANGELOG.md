@@ -1,5 +1,11 @@
 # Changelog
 
+## [3.3.1] - 2021-05-29
+
+### Added
+
+-  Don't store logs for test cases to reduce memory usage (#47 thanks to @vorce)
+
 ## [3.3.0] - 2021-05-29
 
 ### Added
