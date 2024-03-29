@@ -207,6 +207,7 @@ defmodule JUnitFormatter do
       [
         errors: stats.errors,
         failures: stats.failures,
+        skipped: stats.skipped,
         name: name,
         tests: stats.tests,
         time: format_time(stats.time)
