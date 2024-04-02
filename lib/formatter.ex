@@ -87,7 +87,7 @@ defmodule JUnitFormatter do
     {:noreply, config}
   end
 
-  def handle_cast({:test_finished, %ExUnit.Test{state: {:skip, _}} = test}, config) do
+  def handle_cast({:test_finished, %ExUnit.Test{state: {tag, _}} = test}, config) when tag in [:skip, :skipped] do
     config = adjust_case_stats(test, :skipped, config)
 
     {:noreply, config}
@@ -207,6 +207,7 @@ defmodule JUnitFormatter do
       [
         errors: stats.errors,
         failures: stats.failures,
+        skipped: stats.skipped,
         name: name,
         tests: stats.tests,
         time: format_time(stats.time)
@@ -234,7 +235,7 @@ defmodule JUnitFormatter do
   defp generate_test_body(%ExUnit.Test{state: nil}, _idx), do: []
 
   defp generate_test_body(%ExUnit.Test{state: {atom, message}}, _idx)
-       when atom in ~w[skip excluded]a do
+       when atom in ~w[skip skipped excluded]a do
     [{:skipped, [message: message], []}]
   end
 
