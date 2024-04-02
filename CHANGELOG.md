@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.4.0] - 2024-04-02
+
+### Changed
+
+- Minimum Elixir version bumped to 1.12 (because of sweet_xml minimum version)
+
+### Fixed
+
+- Test runs
+- Adjusted skipped test counting (#50 thanks to @mengdaming)
+
 ## [3.3.1] - 2021-05-29
 
 ### Added

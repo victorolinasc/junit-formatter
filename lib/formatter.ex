@@ -9,14 +9,14 @@ defmodule JUnitFormatter do
   - Testsuites - :testsuite
   - Testsuite - `ExUnit.Case`
   - failures = failures
-  - skipped = skip
+  - skipped = skipped
   - errors = invalid
   - time = (sum of all times in seconds rounded down)
   - Testcase - `ExUnit.Test`
   - name = :case
   - test = :test
   - content (only if not successful)
-  - skipped = {:state, {:skip, _}}
+  - skipped = {:state, {:skipped, _}}
   - failed = {:state, {:failed, {_, reason, stacktrace}}}
   - reason = reason.message
   - content = `Exception.format_stacktrace/1`
@@ -87,7 +87,8 @@ defmodule JUnitFormatter do
     {:noreply, config}
   end
 
-  def handle_cast({:test_finished, %ExUnit.Test{state: {tag, _}} = test}, config) when tag in [:skip, :skipped] do
+  def handle_cast({:test_finished, %ExUnit.Test{state: {tag, _}} = test}, config)
+      when tag == :skipped do
     config = adjust_case_stats(test, :skipped, config)
 
     {:noreply, config}
@@ -115,7 +116,7 @@ defmodule JUnitFormatter do
 
   @doc "Formats time from nanos to seconds"
   @spec format_time(integer) :: binary
-  def format_time(time), do: '~.4f' |> :io_lib.format([time / 1_000_000]) |> List.to_string()
+  def format_time(time), do: ~c"~.4f" |> :io_lib.format([time / 1_000_000]) |> List.to_string()
 
   @doc """
   Helper function to get the full path of the generated report file.
@@ -249,7 +250,7 @@ defmodule JUnitFormatter do
   end
 
   defp generate_test_body(%ExUnit.Test{state: {:invalid, %name{} = module}}, _idx),
-    do: [{:error, [message: "Invalid module #{name}"], ['#{inspect(module)}']}]
+    do: [{:error, [message: "Invalid module #{name}"], [~c"#{inspect(module)}"]}]
 
   defp message([msg | _]), do: message(msg)
   defp message({_, %ExUnit.AssertionError{message: reason}, _}), do: reason

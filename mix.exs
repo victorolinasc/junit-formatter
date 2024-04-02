@@ -8,7 +8,7 @@ defmodule Formatter.Mixfile do
     [
       app: :junit_formatter,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.12",
       deps: deps(),
       package: package(),
       docs: docs(),
