@@ -24,7 +24,7 @@ defmodule FormatterTest do
 
       output = run_and_capture_output(seed: 0)
 
-      assert '0' ==
+      assert ~c"0" ==
                xpath(output, ~x{/testsuites/testsuite/properties/property[@name="seed"]/@value})
     end
 
@@ -95,7 +95,7 @@ defmodule FormatterTest do
       output = run_and_capture_output()
 
       # assert it contains correct suite
-      assert %{errors: '0', failures: '1', tests: '2'} =
+      assert %{errors: ~c"0", failures: ~c"1", tests: ~c"2"} =
                xpath(output, ~x"//testsuite",
                  errors: ~x"./@errors",
                  failures: ~x"./@failures",
@@ -135,7 +135,7 @@ defmodule FormatterTest do
 
       output = run_and_capture_output()
 
-      assert %{failures: '1'} = xpath(output, ~x"//testsuite", failures: ~x"./@failures")
+      assert %{failures: ~c"1"} = xpath(output, ~x"//testsuite", failures: ~x"./@failures")
 
       assert_xpath(
         output,
@@ -412,12 +412,11 @@ defmodule FormatterTest do
   defp run_and_capture_output(opts \\ []) do
     ExUnit.configure(Keyword.merge(opts, formatters: [JUnitFormatter]))
 
-    funs = ExUnit.Server.__info__(:functions)
+    funs = ExUnit.Server.__info__(:functions) |> Map.new()
 
-    if Keyword.has_key?(funs, :modules_loaded) do
-      apply(ExUnit.Server, :modules_loaded, [])
-    else
-      apply(ExUnit.Server, :cases_loaded, [])
+    case funs do
+      %{modules_loaded: 1} -> apply(ExUnit.Server, :modules_loaded, [true])
+      %{modules_loaded: 0} -> apply(ExUnit.Server, :modules_loaded, [])
     end
 
     ExUnit.run()
